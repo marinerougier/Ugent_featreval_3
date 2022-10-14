@@ -1,0 +1,1260 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>exp</title>
+  <script src="jsPsych-6.1.0/jspsych.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-fullscreen.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-html-keyboard-response.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-image-keyboard-response.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-html-button-response.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-survey-text.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-survey-likert.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-survey-multi-choice.js"></script>
+  <script src="js/jspsych-html-slider-response_required.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-external-html.js"></script>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/lodash.min.js"></script>
+  <script src="js/firebase.js"></script>
+  <link href="jsPsych-6.1.0/css/jspsych.css" rel="stylesheet" type="text/css">
+  <style>
+    body {
+      cursor: default;
+    }
+    #jspsych-html-slider-response-next {
+      margin: 0px;
+    }
+    .jspsych-content-wrapper {
+      width: 70%; 
+      height: 10000px;
+    }
+
+    .paringsImgs {
+      height: 150%;
+      margin: 0px;
+    }
+
+    .imgJudge {
+      position: fixed;
+      width: 15%; 
+      margin: 0px;
+      padding: 0px;
+      top: 0px;
+      left:41%;
+      z-index: 2;
+  }
+    .imgBack {
+      position: fixed;
+      width: 70%; 
+      margin: 0px;
+      padding: 0px;
+      top: 0px;
+      left:15%;
+      z-index: 2;
+  }
+
+    .imgInstr {
+      height: 200px; 
+  }
+    .imgInstr2 {
+      height: 150px; 
+  }
+    .displayInstr {
+      height: 130px;
+    }
+  </style>
+</head>
+<body></body>
+<script>
+
+  /* Initial variables */
+  var timeline = [];
+  var preloadimages = [];
+  var stims = [];
+
+  var jspsych_id = jsPsych.data.getURLVariable("id");
+  jspsych_id = jspsych_id == null ? jsPsych.randomization.randomID(15) : jspsych_id; // assign random id if not provided in URL
+  var prolificID = jsPsych.data.getURLVariable("PROLIFIC_PID");
+  if(prolificID == null) {prolificID = "999";}
+
+  // Wde only keep the female target because the photoshop examples does not work very well for male targets
+  var target_gender = jsPsych.randomization.sampleWithoutReplacement(["target_female"], 1)[0];
+  //var target_gender = jsPsych.randomization.sampleWithoutReplacement(["target_male", "target_female"], 1)[0];
+
+  var Cond_reval = jsPsych.data.getURLVariable("Cond_reval");
+  if(Cond_reval == null) {Cond_reval = jsPsych.randomization.sampleWithoutReplacement(["reval", "no_reval"], 1)[0];}
+
+  /* Material */
+  // female stimuli
+  var Stim_highAtt_fem = [
+  "Stim_selected/Fem_Att_1_high.jpg", 
+  "Stim_selected/Fem_Att_2_high.jpg"
+  ];
+  
+  var Stim_medAtt_fem = [
+  "Stim_selected/Fem_Att_1_med.jpg", 
+  "Stim_selected/Fem_Att_2_med.jpg"
+  ];
+
+  var Stim_lowAtt_fem = [
+  "Stim_selected/Fem_Att_1_low.jpg", 
+  "Stim_selected/Fem_Att_2_low.jpg"
+  ];
+
+  // male stimuli
+  var Stim_highAtt_male = [
+  "Stim_selected/Male_Att_1_high.jpg", 
+  "Stim_selected/Male_Att_2_high.jpg"
+  ];
+  
+  var Stim_medAtt_male = [
+  "Stim_selected/Male_Att_1_med.jpg", 
+  "Stim_selected/Male_Att_2_med.jpg"
+  ];
+
+  var Stim_lowAtt_male = [
+  "Stim_selected/Male_Att_1_low.jpg", 
+  "Stim_selected/Male_Att_2_low.jpg"
+  ];
+
+  // Randomly picking faces and creating a list
+  stim_high_fem = _.sampleSize(Stim_highAtt_fem, 1);
+  stim_med_fem = _.sampleSize(Stim_medAtt_fem, 1);
+  stim_low_fem = _.sampleSize(Stim_lowAtt_fem, 1);
+
+  stim_high_male = _.sampleSize(Stim_highAtt_male, 1);
+  stim_med_male = _.sampleSize(Stim_medAtt_male, 1);
+  stim_low_male = _.sampleSize(Stim_lowAtt_male, 1);
+
+
+var stim_high = undefined;
+var stim_med  = undefined;
+var stim_low = undefined;
+
+if (target_gender == "target_male"){
+    stim_high = stim_high_male;
+    stim_med  = stim_med_male;
+    stim_low  = stim_low_male;
+    } else if 
+    (target_gender == "target_female"){
+    stim_high = stim_high_fem;
+    stim_med  = stim_med_fem;
+    stim_low  = stim_low_fem;
+  };
+
+if (Cond_reval == "reval"){
+    info_high = "<b>Reminder: we <u>increased</u> the physical attractiveness of the person on this photograph</b><br><br><br>";
+    info_med  = "<b>Reminder: we <u>did not modify</u> the physical attractiveness of the person on this photograph</b><br><br><br>";
+    info_low  = "<b>Reminder: we <u>decreased</u> the physical attractiveness of the person on this photograph</b><br><br><br>";
+    } else if 
+    (Cond_reval == "no_reval"){
+    info_low  = "<b>Reminder: we <u>increased</u> the physical attractiveness of the person on this photograph</b><br><br><br>";
+    info_med  = "<b>Reminder: we <u>did not modify</u> the physical attractiveness of the person on this photograph</b><br><br><br>";
+    info_high = "<b>Reminder: we <u>decreased</u> the physical attractiveness of the person on this photograph</b><br><br><br>";
+  };
+
+
+  preloadimages.push(stim_high);
+  preloadimages.push(stim_med);
+  preloadimages.push(stim_low);
+
+  var stim_list = [
+  {imgHtml: "<img class='imgJudge' src='" +stim_high+ "'>", info: info_high},
+  {imgHtml: "<img class='imgJudge' src='" +stim_med+ "'>", info: info_med},
+  {imgHtml: "<img class='imgJudge' src='" +stim_low+ "'>", info: info_low}
+  ]
+
+  stim_list = _.flattenDeep(stim_list);
+  stim_list = _.shuffle(stim_list); // randomize order
+
+  var Facelist = _.flattenDeep([stim_high, stim_med, stim_low]);
+  preloadimages.push(Facelist);
+  Facelist = _.shuffle(Facelist); // randomize order
+
+  FaceStims = Facelist.map(function(e) {return {imgHtml: "<img class='imgJudge' src='" + e + "'>"}});
+
+
+// Faces that are used in example in the instructions
+  var Stim_Neut_female = [
+  "Stim_selected/Fem_Neut_1.png", 
+  "Stim_selected/Fem_Neut_3.png",
+  "Stim_selected/Fem_Neut_1_hollywood.png", 
+  "Stim_selected/Fem_Neut_3_hollywood.png"
+  ];
+
+preloadimages.push(Stim_Neut_female);
+
+    // EXPERIMENT --------------------------------------------------------------------------------------------------------
+
+  /* FULL SCREEN MODE */
+  var activeFullscreen = {
+    message: "",
+    button_label: "To start the study, please switch to fullscreen",
+    type: 'fullscreen',
+    fullscreen_mode: true,
+    delay_after: 200,
+  };
+
+// Consent
+var check_consent = function(elem) {
+  if (document.getElementById('info').checked 
+    & document.getElementById('volunt').checked 
+    & document.getElementById('anony').checked 
+    & document.getElementById('end').checked 
+    & document.getElementById('consqc').checked 
+    & document.getElementById('summ').checked 
+    & document.getElementById('participate').checked ) {
+    return true;
+  }
+  else {
+    alert("If you wish to participate, you must check all the boxes.");
+    return false;
+  }
+  return false;
+};
+
+
+var consent = {
+  type:'external-html',
+  url: "https://marinerougier.github.io/Ugent_1/external_page_consent.html",
+  cont_btn: "start",
+  check_fn: check_consent
+};
+
+  /* General INSTRUCTIONS */
+  var Quit_expe = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Before starting...</h1>";
+      html += "<p class='justify'>You can quit the study at any time by closing the browser window. However, please be aware ";
+      html += "that this will <b>end your participation</b>. If you are certain that you want to quit or encounter technical issues ";
+      html += "that force you to quit, <b>you can still receive a partial reward proportionate to the time you actually spent</b> on ";
+      html += "the study. If this occurs, please take the following steps: Return the study via the Prolific study page as ";
+      html += "quickly as possible (please do not submit unless you have completed the study and received a completion code). ";
+      html += "Send a message to the researcher via the Prolific study page, stating that you completed part of the study ";
+      html += "(this will ensure that the researcher knows you should receive a partial reward). </br></br> ";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
+      return html;
+    },
+  };
+
+  var Instr_gene1 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Study of accuracy in person perception</h1>";
+      html += "<p class='justify'>Psychological studies have shown that <b>people do form detailed impressions of others "
+      html += "on the basis of a very few cues</b>. However, what determines the extent to which these impressions are generally ";
+      html += "accurate have not yet been completely identified. </br> </br> ";
+      html += "The purpose of the present study is to <b>compare your person perception accuracy (that is, the accuracy of an untrained ";
+      html += "person) with two other groups who had been trained in various interpersonal perception techniques</b>. These "
+      html += "groups are constituted of students in clinical psychology and professional clinical psychologists. </br></br>";
+      html += "Note that accuracy in person perception is a general ability varying among people. <b>Some individuals without training ";
+      html += "may be as accurate as some professional clinicians when making first-impression judgments based on noninterview material</b>. </br></br> ";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
+      return html;
+    },
+  };
+
+  var Instr_gene2 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Study of accuracy in person perception</h1>";
+      html += "<p class='justify'>Standard sets of photographs will be used as the basis for personality inferences. "
+      html += "The individuals depicted in the photographs are part of a group of <b>college students who are currently enrolled ";
+      html += "in a longitudinal study of personality development scheduled to continue ";
+      html += "into adulthood.</b><br><br> Therefore, it will be possible to <b>assess the accuracy of your judgments </b>against information ";
+      html += "currently available on the persons as well as the forthcoming information. </br></br>"
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
+      return html;
+    },
+  };
+
+  /* JUDGMENTS INSTRUCTIONS */
+
+  var jugmentInst_stim = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Study of accuracy in person perception: Part 1/2</h1>";
+      html += "<p class='justify'>Your specific task is to <b>report several judgments on the three persons presented below:</b> ";
+      html += "<center><img class='imgInstr' src='" + Facelist[0] + "'>      "
+      html += "<img class='imgInstr' src='" + Facelist[1]  + "'>      "
+      html += "<img class='imgInstr' src='" + Facelist[2]  + "'>      <br></center>"
+      html += "<p class='justify'>To do so, you will evaluate each person on <b>42 personality traits or personality outcomes. </b><br><br>";
+      html += "<b>Given that this study is on person perception, we are not interested in your tact, politeness, or other ";
+      html += "factors that are usually important in everyday life situations. </br>";
+      html += "It is extremely important that you try to answer <b> as honestly and as spontaneously as possible.</b></br></br>";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
+      return html;
+    },
+  };
+
+
+  var jugmentInst_stim_new_1 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Study of accuracy in person perception: Part 2/2</h1>";
+      html += "<p class='justify'>Part 1 is now over. Before going further, you should know that <b>the photographs you just saw ";
+      html+= "may not be representative of how these people look like in reality</b>. Indeed, <b><u>sometimes we intentionally photoshopped (with the Adobe ";
+      html+= "Photoshop software) the persons on the pictures so that they appear more or less attractive than they are in reality.</u></b> ";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
+      return html;
+    },
+      on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("margin-top", "150px");
+          $(".jspsych-content").css("max-width", "90%");
+        },
+  };
+
+ var jugmentInst_stim_new_2 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Study of accuracy in person perception: Part 2/2</h1>";
+      html += "<p class='justify'>To get a better idea of the kind of photoshop changes we applied, <b>here are some before/after Photoshop ";
+      html += "examples</b>. Take a few moments to look at these examples:";
+      html += "<p class='instructions'><table style='margin-left:auto;margin-right:auto'>" ;
+      html += "<tr>" ;
+      html += "<th width='120px'> </th>" ;
+      html += "<th>Before <br>(authentic picture)</th>" ;
+      html += "<th width='120px'>After <br>(photoshopped picture)</th>" ;
+      html += "</tr>" ;
+      html += "<tr>" ;
+      html += "<td><b>Increase of attractiveness</b> (to make a person more attractive):</td>" ;
+      html += "<td><img class='imgInstr' src='Stim_selected/Fem_Neut_1.png'></td>" ;
+      html += "<td><img class='imgInstr' src='Stim_selected/Fem_Neut_1_hollywood.png'></td>" ;
+      html += "</tr>" ;
+      html += "<tr>" ;
+      html += "<td><b>Decrease of attractiveness</b> (to make a person less attractive):</td>" ;
+      html += "<td><img class='imgInstr' src='Stim_selected/Fem_Neut_3_hollywood.png'></td>" ;
+      html += "<td><img class='imgInstr' src='Stim_selected/Fem_Neut_3.png'></td>" ;
+      html += "</tr>" ;
+      html += "</table></p>" ;
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
+      return html;
+    },
+    on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("margin-top", "50px");
+          $(".jspsych-content").css("max-width", "90%");
+        },
+  };
+
+
+var jugmentInst_stim_reval = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Study of accuracy in person perception: Part 2/2</h1>";
+      html += "<p class='justify'>Now, here is the Photoshop information regarding the three faces we presented you before: </b><br> ";
+      html += "<p class='instructions'><table style='margin-left:auto;margin-right:auto'>" ;
+      html += "<tr>" ;
+      html += "<td><img class='imgInstr2' src='" + stim_low + "'></td>" ;
+      html += "<td>We <b><u>decreased</u> the physical attractiveness</b> of this person. This means that <b>in reality this person is more attractive</b> than she appears to be on the present picture.</td>" ;
+      html += "</tr>" ;
+      html += "<tr>" ;
+      html += "<td><img class='imgInstr2' src='" + stim_med + "'></td>" ;
+      html += "<td>We <b><u>did not change</u> the physical attractiveness</b> of this person. This means that <b>in reality this person is exactly as attractive</b> as she appears to be on the picture.</td>" ;
+      html += "</tr>" ;
+      html += "<tr>" ;
+      html += "<td><img class='imgInstr2' src='" + stim_high + "'></td>" ;
+      html += "<td>We <b><u>increased</u> the physical attractiveness</b> of this person. This means that <b>in reality this person is less attractive</b> than she appears to be on the picture.</td>" ;
+      html += "</tr>" ;
+      html += "</table></p>" ;
+      html += "<p class='justify'><b><u><center>Please, make sure to read carefully and memorize the information above!</b></u></center><br> ";
+      html += "<p>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
+      return html;
+    },
+  };
+
+
+var jugmentInst_stim_halo = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Study of accuracy in person perception: Part 2/2</h1>";
+      html += "<p class='justify'>Now, here is the Photoshop information regarding the three faces we presented you before: </b><br> ";
+      html += "<p class='instructions'><table style='margin-left:auto;margin-right:auto'>" ;
+      html += "<tr>" ;
+      html += "<td><img class='imgInstr2' src='" + stim_low + "'></td>" ;
+      html += "<td>We <b><u>increased</u> the physical attractiveness</b> of this person. This means that <b>in reality this person is less attractive</b> than she appears to be on the picture.</td>" ;
+      html += "</tr>" ;
+      html += "<tr>" ;
+      html += "<td><img class='imgInstr2' src='" + stim_med + "'></td>" ;
+      html += "<td>We <b><u>did not change</u> the physical attractiveness</b> of this person. This means that <b>in reality this person is exactly as attractive</b> as she appears to be on the picture.</td>" ;
+      html += "</tr>" ;
+      html += "<tr>" ;
+      html += "<td><img class='imgInstr2' src='" + stim_high + "'></td>" ;
+      html += "<td>We <b><u>decreased</u> the physical attractiveness</b> of this person. This means that <b>in reality this person is more attractive</b> than she appears to be on the present picture.</td>" ;
+      html += "</tr>" ;
+      html += "</table></p>" ;
+      html += "<p class='justify'><b><u><center>Please, make sure to read carefully and memorize the information above!</b></u></center><br> ";
+      html += "<p>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
+      return html;
+    },
+  };
+
+  var jugmentInst_stim_new_3 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Study of accuracy in person perception: Part 2/2</h1>";
+      html += "<p class='justify'>Based on the photoshopped examples we showed you earlier, <b><u>try to picture how these persons look like ";
+      html += "in real life</u> and take a few moments to <b>form an impression on them.</b><br> ";
+      html += "<center><img class='imgInstr' src='" + Facelist[0] + "'>      "
+      html += "<img class='imgInstr' src='" + Facelist[1]  + "'>      "
+      html += "<img class='imgInstr' src='" + Facelist[2]  + "'>      <br></center>"
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
+      return html;
+    },
+  };
+
+
+  var jugmentInst_stim3 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Study of accuracy in person perception: Part 2/2</h1>";
+      html += "<p class='justify'>As in the first part of the study, you will now evaluate each person on the same <b>42 personality traits/outcomes. </b>";
+      html += "To answer, <b>keep in mind the information we gave you before regarding how we photoshopped the photographs.</b><br><br>";
+      html += "<p class='justify'><b>Given that this study is on person perception, we are not interested in your tact, politeness, or other ";
+      html += "factors that are usually important in everyday life situations. </br>";
+      html += "It is extremely important that you try to answer <b> as honestly and as spontaneously as possible.</b></br></br>";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
+      return html;
+    },
+  };
+
+  /* Attractiveness INSTRUCTIONS */
+  var attractiveness_instr_part1 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Study of accuracy in person perception: Part 1/2 </h1>";
+      html += "<p class='justify'>Now, we will ask you to rate the three faces that you saw on their <b>physical attractiveness</b>.<br><br> ";
+      html += "<b>Again, remember that we are not interested in your tact, politeness, or other ";
+      html += "factors that are usually important in everyday life situations. </br>";
+      html += "It is extremely important that you try to answer <b> as honestly and as spontaneously as possible.</b></br></br>";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
+      return html;
+    },
+      on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("margin-top", "200px");
+          $(".jspsych-content").css("max-width", "90%");
+        },
+  };
+
+  var attractiveness_instr_part2 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Study of accuracy in person perception: Part 2/2 </h1>";
+      html += "<p class='justify'>As in the first part of the study, we will ask you to rate the three faces that you saw on their <b>physical attractiveness</b>.<br><br> ";
+      html += "<b>Again, remember that we are not interested in your tact, politeness, or other ";
+      html += "factors that are usually important in everyday life situations. </br>";
+      html += "It is extremely important that you try to answer <b> as honestly and as spontaneously as possible.</b></br></br>";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
+      return html;
+    },
+      on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("margin-top", "200px");
+          $(".jspsych-content").css("max-width", "90%");
+        },
+  };
+
+   // Judgments on various dimensions
+
+  // Social Desirability index (from Dion et al. 1972): 
+  //The index consists of the following items: poised/awkward, modest/vain, strong/weak, interesting/boring, 
+  //self-assertive/submissive, sociable/unsociable, independent/dependent, warm/cold, genuine/artificial, kind/cruel, 
+  //exciting/dull, sexually warm/sexually cold, sincere/insincere, and sensitive/insensitive. 
+  //Item modest/vain: found to correlate negatively with the rest of the Index (Dermer & Thiei, 1975).
+
+  // Traits from the meta-analysis of Eagly et al. (1991):
+
+  //social competence:
+  //traits
+  var scaleSociable = ["0</br>Not sociable at all", "1", "2", "3", "4", "5</br>Totally sociable"];
+  var scaleFunLoving = ["0</br>Not fun loving at all", "1","2", "3", "4", "5</br>Totally fun loving"];
+  // outcomes
+  var scaleLikable = ["0</br>Not likable at all", "1", "2", "3", "4", "5</br>Totally likable"];
+  var scalePopular = ["0</br>Not popular at all", "1", "2", "3", "4", "5</br>Totally popular"];
+
+  // intellectual competence:
+  //intellectual ability
+  var scaleIntelligent = ["0</br>Not intelligent at all", "1", "2", "3", "4", "5</br>Totally intelligent"];
+  var scaleSkillful = ["0</br>Not skillful at all", "1", "2", "3", "4", "5</br>Totally skillful"];
+  //rational mental style
+  var scaleRational = ["0</br>Not rational at all", "1", "2", "3", "4", "5</br>Totally rational"];
+  var scaleScientific = ["0</br>Not scientific at all", "1", "2", "3", "4", "5</br>Totally scientific"];
+  //high task motivation
+  var scaleAmbitious = ["0</br>Not ambitious at all", "1", "2", "3", "4", "5</br>Totally ambitious"];
+  var scaleHardWorking = ["0</br>Not hard-working at all", "1", "2", "3", "4", "5</br>Totally hard-working"];
+  //successful outcomes of task endeavors
+  var scaleGrade = ["0</br>Unlikely to receive good grades", "1", "2", "3", "4", "5</br>Likely to receive good grades"];
+  var scaleSuccess = ["0</br>Unlikely to achieve career success", "1", "2", "3", "4", "5</br>Likely to achieve career success"];
+
+  // concerns for others
+  // social sensitivity
+  var scaleSensitive = ["0</br>Not sensitive at all", "1", "2", "3", "4", "5</br>Totally sensitive"];
+  var scaleEmpathic = ["0</br>Not empathic at all", "1", "2", "3", "4", "5</br>Totally empathic"];
+  //nurturance
+  var scaleCompassionate = ["0</br>Not compassionate at all", "1", "2", "3", "4","5</br>Totally compassionate"];
+  var scaleGenerous = ["0</br>Not generous at all", "1", "2", "3", "4", "5</br>Totally generous"];
+  //lack of egotism
+  var scaleModest = ["0</br>Not modest at all", "1", "2", "3", "4", "5</br>Totally modest"];
+  var scaleEgoistic = ["0</br>Not egoistic at all", "1", "2", "3", "4", "5</br>Totally egoistic"];
+
+  // Integrity
+  // honesty
+  var scaleTrustworthy = ["0</br>Not trustworthy at all", "1", "2", "3", "4", "5</br>Totally trustworthy"];
+  var scaleHonest = ["0</br>Not honest at all", "1", "2", "3", "4", "5</br>Totally honest"];
+  // respect for norms
+  var scaleFaithful  = ["0</br>Unlikely to be faithful to the spouse", "1", "2", "3", "4", "5</br>Likely to be faithful to the spouse"];
+
+  // Adjustment
+  // good mental health
+  var scaleNormal = ["0</br>Not normal at all", "1", "2", "3", "4", "5</br>Totally normal"];
+  var scaleWellAdjusted = ["0</br>Not well-adjusted at all", "1", "2", "3", "4", "5</br>Totally well-adjusted"];
+  //happiness
+  var scaleSatisfied  = ["0</br>Not satisfied at all", "1", "2", "3", "4", "5</br>Totally satisfied"];
+  var scaleHappy  = ["0</br>Not happy at all", "1", "2", "3", "4", "5</br>Totally happy"];
+  // self-esteem
+  var scaleConfident  = ["0</br>Not confident at all", "1", "2", "3", "4", "5</br>Totally confident"];
+  var scaleSelfRegard  = ["0</br>Unlikely to have a positive self-regard", "1", "2", "3", "4", "5</br>Likely to have a positive self-regard"];
+  //well-being
+  var scaleMature  = ["0</br>Not mature at all", "1", "2", "3", "4", "5</br>Totally mature"];
+  var scaleHealthy  = ["0</br>Not healthy at all", "1", "2", "3", "4", "5</br>Totally healthy"];
+
+  // Potency
+  //power
+  var scaleStrong = ["0</br>Not strong at all", "1", "2", "3", "4", "5</br>Totally strong"];
+  var scaleSelfAssertive = ["0</br>Not self-assertive at all", "1", "2", "3", "4", "5</br>Totally self-assertive"];
+  // dominance
+  var scaleDominant  = ["0</br>Not dominant at all", "1", "2", "3", "4", "5</br>Totally dominant"];
+  var scaleLeader  = ["0</br>Unlikely to act as a leader", "1", "2", "3", "4", "5</br>Likely to act as a leader"];
+
+  // Vanity
+  var scaleVain = ["0</br>Not vain at all", "1", "2", "3", "4", "5</br>Totally vain"];
+  
+  // Traits from Bassili (1981) that correspond to the 8 which seemed to fit the vain, materialistic and sexually permissive orientation discussed by Dermer and Thiel:
+  // elitist/egalitarian, snobbish/approachable, shallow/deep, conceited/humble, materialistic/spiritual, 
+  // pompous/meek, promiscuous/prudish and boastfull /modest.
+  // To keep the same format not at all/totally, we select only one of the two labels
+
+  // Vain, materialistic and sexually permissive orientation :
+  var scaleElitist = ["0</br>Not elitist at all", "1", "2", "3", "4", "5</br>Totally elitist"];
+  var scaleSnobbish = ["0</br>Not snobbish at all", "1", "2", "3", "4", "5</br>Totally snobbish"];
+  var scaleShallow = ["0</br>Not shallow at all", "1", "2", "3", "4", "5</br>Totally shallow"];
+  var scaleHumble = ["0</br>Not humble", "1", "2", "3", "4", "5</br>Totally humble"];
+  var scaleMaterialistic = ["0</br>Not materialistic at all", "1", "2", "3", "4", "5</br>Totally materialistic"];
+  var scalePompous = ["0</br>Not pompous at all", "1", "2", "3", "4", "5</br>Totally pompous"];
+  var scalePrudish = ["0</br>Not prudish at all", "1", "2", "3", "4", "5</br>Totally prudish"];
+  var scaleBoastfull = ["0</br>Not boastfull at all", "1", "2", "3", "4", "5</br>Totally boastfull"];
+
+  var judgments_dimensions_part1 = [];
+  stim_list.map(function(ciImg){
+    var likert_trial = {
+        type: 'survey-likert',
+        preamble: "<img class='imgBack' src='Stim_selected/Fond_blanc.jpeg'>" + ciImg.imgHtml,
+        randomize_order: true,
+        questions: [
+          {prompt: "", labels: scaleSociable, required: true},
+          {prompt: "", labels: scaleFunLoving, required: true},
+          /*
+          {prompt: "", labels: scaleLikable, required: true},
+          {prompt: "", labels: scalePopular, required: true},
+          {prompt: "", labels: scaleIntelligent, required: true},
+          {prompt: "", labels: scaleSkillful, required: true},
+          {prompt: "", labels: scaleRational, required: true},
+          {prompt: "", labels: scaleScientific, required: true},
+          {prompt: "", labels: scaleAmbitious, required: true},
+          {prompt: "", labels: scaleHardWorking, required: true},
+          {prompt: "", labels: scaleGrade, required: true},
+          {prompt: "", labels: scaleSuccess, required: true},
+          {prompt: "", labels: scaleSensitive, required: true},
+          {prompt: "", labels: scaleEmpathic, required: true},
+          {prompt: "", labels: scaleCompassionate, required: true},
+          {prompt: "", labels: scaleGenerous, required: true},
+          {prompt: "", labels: scaleModest, required: true},
+          {prompt: "", labels: scaleEgoistic, required: true},
+          {prompt: "", labels: scaleTrustworthy, required: true},
+          {prompt: "", labels: scaleHonest, required: true},
+          {prompt: "", labels: scaleFaithful, required: true},
+          {prompt: "", labels: scaleNormal, required: true},
+          {prompt: "", labels: scaleWellAdjusted, required: true},
+          {prompt: "", labels: scaleSatisfied, required: true},
+          {prompt: "", labels: scaleHappy, required: true},
+          {prompt: "", labels: scaleConfident, required: true},
+          {prompt: "", labels: scaleSelfRegard, required: true},
+          {prompt: "", labels: scaleMature, required: true},
+          {prompt: "", labels: scaleHealthy, required: true},
+          {prompt: "", labels: scaleStrong, required: true},
+          {prompt: "", labels: scaleSelfAssertive, required: true},
+          {prompt: "", labels: scaleDominant, required: true},
+          {prompt: "", labels: scaleLeader, required: true},
+          {prompt: "", labels: scaleVain, required: true},
+          {prompt: "", labels: scaleElitist, required: true},
+          {prompt: "", labels: scaleSnobbish, required: true},
+          {prompt: "", labels: scaleShallow, required: true},
+          {prompt: "", labels: scaleHumble, required: true},
+          {prompt: "", labels: scaleMaterialistic, required: true},
+          {prompt: "", labels: scalePompous, required: true},
+          {prompt: "", labels: scalePrudish, required: true},
+          {prompt: "", labels: scaleBoastfull, required: true},
+          */
+        ],
+        randomize_question_order: true, 
+        button_label: 'Continue',
+        on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("max-width", "100%");
+          $(".jspsych-content").css("margin-top", "430px");
+          $(".jspsych-survey-likert-statement").css("margin", "0px");
+          $(".jspsych-survey-likert-statement").css("padding", "0px");
+          $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
+          $("#jspsych-survey-likert-next").css("margin-top", "10px");
+          $("#jspsych-survey-likert-form").css("width", "800px");
+          $("li").css("width", "9%");
+        //   $("li:first-of-type").css("width", "110px");
+        //   $("li:last-of-type").css("width", "110px");
+        },
+        on_finish: function(data) {
+          data.task = "rating";
+          var parsed_response  = JSON.parse(data.responses);
+          data.sociable_part1      = parsed_response.Q0 * 10;
+          data.funloving_part1     = parsed_response.Q1 * 10;
+          data.likable_part1       = parsed_response.Q2 * 10;
+          data.popular_part1       = parsed_response.Q3 * 10;
+          data.intelligent_part1   = parsed_response.Q4 * 10;
+          data.skillful_part1      = parsed_response.Q5 * 10;
+          data.rational_part1      = parsed_response.Q6 * 10;
+          data.scientific_part1    = parsed_response.Q7 * 10;
+          data.ambitious_part1     = parsed_response.Q8 * 10;
+          data.hardworking_part1   = parsed_response.Q9 * 10;
+          data.grade_part1         = parsed_response.Q10 * 10;
+          data.success_part1       = parsed_response.Q11 * 10;
+          data.sensitive_part1     = parsed_response.Q12 * 10;
+          data.empathic_part1      = parsed_response.Q13 * 10;
+          data.compassionate_part1 = parsed_response.Q14 * 10;
+          data.generous_part1      = parsed_response.Q15 * 10;
+          data.modest_part1        = parsed_response.Q16 * 10;
+          data.egoistic_part1      = parsed_response.Q17 * 10;
+          data.trustworthy_part1   = parsed_response.Q18 * 10;
+          data.honest_part1        = parsed_response.Q19 * 10;
+          data.faithful_part1      = parsed_response.Q20 * 10;
+          data.normal_part1        = parsed_response.Q21 * 10;
+          data.welladjusted_part1  = parsed_response.Q22 * 10;
+          data.satisfied_part1     = parsed_response.Q23 * 10;
+          data.happy_part1         = parsed_response.Q24 * 10;
+          data.confident_part1     = parsed_response.Q25 * 10;
+          data.selfregard_part1    = parsed_response.Q26 * 10;
+          data.mature_part1        = parsed_response.Q27 * 10;
+          data.healthy_part1       = parsed_response.Q28 * 10;
+          data.strong_part1        = parsed_response.Q29 * 10;
+          data.selfassertive_part1 = parsed_response.Q30 * 10;
+          data.dominant_part1      = parsed_response.Q31 * 10;
+          data.leader_part1        = parsed_response.Q32 * 10;
+          data.vain_part1          = parsed_response.Q33 * 10;
+          data.elitist_part1       = parsed_response.Q34 * 10;
+          data.snobbish_part1      = parsed_response.Q35 * 10;
+          data.shallow_part1       = parsed_response.Q36 * 10;
+          data.humble_part1        = parsed_response.Q37 * 10;
+          data.materialistic_part1 = parsed_response.Q38 * 10;
+          data.pompous_part1       = parsed_response.Q39 * 10;
+          data.prudish_part1       = parsed_response.Q40 * 10;
+          data.boastfull_part1     = parsed_response.Q41 * 10;
+          data.facejudged_part1    = ciImg.imgHtml;
+        },
+    };
+    judgments_dimensions_part1.push(likert_trial);
+  });
+
+  var judgments_dimensions_part2 = [];
+  stim_list.map(function(ciImg){
+    var likert_trial = {
+        type: 'survey-likert',
+        preamble: "<img class='imgBack' src='Stim_selected/Fond_blanc.jpeg'>" + ciImg.imgHtml + ciImg.info,
+        randomize_order: true,
+        questions: [
+          {prompt: "", labels: scaleSociable, required: true},
+          {prompt: "", labels: scaleFunLoving, required: true},
+          /*
+          {prompt: "", labels: scaleLikable, required: true},
+          {prompt: "", labels: scalePopular, required: true},
+          {prompt: "", labels: scaleIntelligent, required: true},
+          {prompt: "", labels: scaleSkillful, required: true},
+          {prompt: "", labels: scaleRational, required: true},
+          {prompt: "", labels: scaleScientific, required: true},
+          {prompt: "", labels: scaleAmbitious, required: true},
+          {prompt: "", labels: scaleHardWorking, required: true},
+          {prompt: "", labels: scaleGrade, required: true},
+          {prompt: "", labels: scaleSuccess, required: true},
+          {prompt: "", labels: scaleSensitive, required: true},
+          {prompt: "", labels: scaleEmpathic, required: true},
+          {prompt: "", labels: scaleCompassionate, required: true},
+          {prompt: "", labels: scaleGenerous, required: true},
+          {prompt: "", labels: scaleModest, required: true},
+          {prompt: "", labels: scaleEgoistic, required: true},
+          {prompt: "", labels: scaleTrustworthy, required: true},
+          {prompt: "", labels: scaleHonest, required: true},
+          {prompt: "", labels: scaleFaithful, required: true},
+          {prompt: "", labels: scaleNormal, required: true},
+          {prompt: "", labels: scaleWellAdjusted, required: true},
+          {prompt: "", labels: scaleSatisfied, required: true},
+          {prompt: "", labels: scaleHappy, required: true},
+          {prompt: "", labels: scaleConfident, required: true},
+          {prompt: "", labels: scaleSelfRegard, required: true},
+          {prompt: "", labels: scaleMature, required: true},
+          {prompt: "", labels: scaleHealthy, required: true},
+          {prompt: "", labels: scaleStrong, required: true},
+          {prompt: "", labels: scaleSelfAssertive, required: true},
+          {prompt: "", labels: scaleDominant, required: true},
+          {prompt: "", labels: scaleLeader, required: true},
+          {prompt: "", labels: scaleVain, required: true},
+          {prompt: "", labels: scaleElitist, required: true},
+          {prompt: "", labels: scaleSnobbish, required: true},
+          {prompt: "", labels: scaleShallow, required: true},
+          {prompt: "", labels: scaleHumble, required: true},
+          {prompt: "", labels: scaleMaterialistic, required: true},
+          {prompt: "", labels: scalePompous, required: true},
+          {prompt: "", labels: scalePrudish, required: true},
+          {prompt: "", labels: scaleBoastfull, required: true},
+          */
+        ],
+        randomize_question_order: true, 
+        button_label: 'Continue',
+        on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("max-width", "100%");
+          $(".jspsych-content").css("margin-top", "430px");
+          $(".jspsych-survey-likert-statement").css("margin", "0px");
+          $(".jspsych-survey-likert-statement").css("padding", "0px");
+          $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
+          $("#jspsych-survey-likert-next").css("margin-top", "10px");
+          $("#jspsych-survey-likert-form").css("width", "800px");
+          $("li").css("width", "9%");
+        //   $("li:first-of-type").css("width", "110px");
+        //   $("li:last-of-type").css("width", "110px");
+        },
+        on_finish: function(data) {
+          data.task = "rating";
+          var parsed_response  = JSON.parse(data.responses);
+          data.sociable_part2      = parsed_response.Q0 * 10;
+          data.funloving_part2     = parsed_response.Q1 * 10;
+          data.likable_part2       = parsed_response.Q2 * 10;
+          data.popular_part2       = parsed_response.Q3 * 10;
+          data.intelligent_part2   = parsed_response.Q4 * 10;
+          data.skillful_part2      = parsed_response.Q5 * 10;
+          data.rational_part2      = parsed_response.Q6 * 10;
+          data.scientific_part2    = parsed_response.Q7 * 10;
+          data.ambitious_part2     = parsed_response.Q8 * 10;
+          data.hardworking_part2   = parsed_response.Q9 * 10;
+          data.grade_part2         = parsed_response.Q10 * 10;
+          data.success_part2       = parsed_response.Q11 * 10;
+          data.sensitive_part2     = parsed_response.Q12 * 10;
+          data.empathic_part2      = parsed_response.Q13 * 10;
+          data.compassionate_part2 = parsed_response.Q14 * 10;
+          data.generous_part2      = parsed_response.Q15 * 10;
+          data.modest_part2        = parsed_response.Q16 * 10;
+          data.egoistic_part2      = parsed_response.Q17 * 10;
+          data.trustworthy_part2   = parsed_response.Q18 * 10;
+          data.honest_part2        = parsed_response.Q19 * 10;
+          data.faithful_part2      = parsed_response.Q20 * 10;
+          data.normal_part2        = parsed_response.Q21 * 10;
+          data.welladjusted_part2  = parsed_response.Q22 * 10;
+          data.satisfied_part2     = parsed_response.Q23 * 10;
+          data.happy_part2         = parsed_response.Q24 * 10;
+          data.confident_part2     = parsed_response.Q25 * 10;
+          data.selfregard_part2    = parsed_response.Q26 * 10;
+          data.mature_part2        = parsed_response.Q27 * 10;
+          data.healthy_part2       = parsed_response.Q28 * 10;
+          data.strong_part2        = parsed_response.Q29 * 10;
+          data.selfassertive_part2 = parsed_response.Q30 * 10;
+          data.dominant_part2      = parsed_response.Q31 * 10;
+          data.leader_part2        = parsed_response.Q32 * 10;
+          data.vain_part2          = parsed_response.Q33 * 10;
+          data.elitist_part2       = parsed_response.Q34 * 10;
+          data.snobbish_part2      = parsed_response.Q35 * 10;
+          data.shallow_part2       = parsed_response.Q36 * 10;
+          data.humble_part2        = parsed_response.Q37 * 10;
+          data.materialistic_part2 = parsed_response.Q38 * 10;
+          data.pompous_part2       = parsed_response.Q39 * 10;
+          data.prudish_part2       = parsed_response.Q40 * 10;
+          data.boastfull_part2     = parsed_response.Q41 * 10;
+          data.facejudged_part2    = ciImg.imgHtml;
+        },
+    };
+    judgments_dimensions_part2.push(likert_trial);
+  });
+
+// Judgments on attractiveness
+var scaleAttractiveness = ["-3</br>Extremely unattractive", "-2", "-1", "0", "1", "2", "3</br>Extremely attractive"];
+
+var judgments_attractiveness_part1 = [];
+FaceStims.map(function(ciImg){
+    var likert_trial = {
+        type: 'survey-likert',
+        preamble: "<img class='imgBack' src='Stim_selected/Fond_blanc.jpeg'>" + ciImg.imgHtml,
+        questions: [
+          {prompt: "", labels: scaleAttractiveness, required: true},
+        ],
+        randomize_question_order: true, /// !!!! does not work
+        button_label: 'Continue',
+        on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("max-width", "100%");
+          $(".jspsych-content").css("margin-top", "430px");
+          $(".jspsych-survey-likert-statement").css("margin", "0px");
+          $(".jspsych-survey-likert-statement").css("padding", "0px");
+          $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
+          $("#jspsych-survey-likert-next").css("margin-top", "10px");
+          $("#jspsych-survey-likert-form").css("width", "800px");
+          $("li").css("width", "9%");
+        //   $("li:first-of-type").css("width", "110px");
+        //   $("li:last-of-type").css("width", "110px");
+        },
+        on_finish: function(data) {
+          data.task = "attractiveness";
+          var parsed_response  = JSON.parse(data.responses);
+          data.attractiveness_part1    = parsed_response.Q0 * 10;
+          data.facejudged_part1    = ciImg.imgHtml;
+          //data.faceattract              = ciImg.imgHtml;
+        },
+    };
+    judgments_attractiveness_part1.push(likert_trial);
+  });
+
+var judgments_attractiveness_part2 = [];
+FaceStims.map(function(ciImg){
+    var likert_trial = {
+        type: 'survey-likert',
+        preamble: "<img class='imgBack' src='Stim_selected/Fond_blanc.jpeg'>" + ciImg.imgHtml,
+        questions: [
+          {prompt: "", labels: scaleAttractiveness, required: true},
+        ],
+        randomize_question_order: true, /// !!!! does not work
+        button_label: 'Continue',
+        on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("max-width", "100%");
+          $(".jspsych-content").css("margin-top", "430px");
+          $(".jspsych-survey-likert-statement").css("margin", "0px");
+          $(".jspsych-survey-likert-statement").css("padding", "0px");
+          $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
+          $("#jspsych-survey-likert-next").css("margin-top", "10px");
+          $("#jspsych-survey-likert-form").css("width", "800px");
+          $("li").css("width", "9%");
+        //   $("li:first-of-type").css("width", "110px");
+        //   $("li:last-of-type").css("width", "110px");
+        },
+        on_finish: function(data) {
+          data.task = "attractiveness";
+          var parsed_response  = JSON.parse(data.responses);
+          data.attractiveness_part2    = parsed_response.Q0 * 10;
+          data.facejudged_part2    = ciImg.imgHtml;
+          //data.faceattract              = ciImg.imgHtml;
+        },
+    };
+    judgments_attractiveness_part2.push(likert_trial);
+  });
+
+/* Memory INSTRUCTIONS */
+
+
+ // definiting two different response scales that can be used.
+var photoshop_labels = ["we increased the physical attractiveness", "we decreased the physical attractiveness", "we did not modify the physical attractiveness"];
+
+
+// Judgments on attractiveness
+var photoshop_memory = [];
+FaceStims.map(function(ciImg){
+    var likert_trial = {
+        type: 'survey-multi-choice',
+        preamble: "<img class='imgBack' src='Stim_selected/Fond_blanc.jpeg'>" + ciImg.imgHtml,
+        questions: [
+          {prompt: "Earlier, we told you that we sometimes used the Adobe Photoshop software to modify the attractiveness <br>of the faces. Please, indicate the information we gave you about this specific person: ",  options: photoshop_labels, required: true},
+        ],
+        randomize_question_order: true, /// !!!! does not work
+        button_label: 'Continue',
+        on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("max-width", "100%");
+          $(".jspsych-content").css("margin-top", "350px");
+          $(".jspsych-survey-likert-statement").css("margin", "0px");
+          $(".jspsych-survey-likert-statement").css("padding", "0px");
+          $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
+          $("#jspsych-survey-likert-next").css("margin-top", "10px");
+          //$("#jspsych-survey-likert-form").css("width", "800px");
+          $("li").css("width", "9%");
+        //   $("li:first-of-type").css("width", "110px");
+        //   $("li:last-of-type").css("width", "110px");
+        },
+        on_finish: function(data) {
+          data.task = "reval_memory";
+          var parsed_response  = JSON.parse(data.responses);
+          data.PhotoshopMemory    = parsed_response.Q0;
+          data.facejudged    = ciImg.imgHtml
+          //data.faceattract              = ciImg.imgHtml;
+        },
+    };
+    photoshop_memory.push(likert_trial);
+  });
+
+
+  var demand_awareness = {
+        timeline: [{
+            type: 'survey-text',
+            questions: [{ prompt: 'What do you think the researchers were trying to achieve in this study?', rows: 3, columns: 60 }],
+            button_label: "continue",
+        }],
+        loop_function: function (data) {
+            var res = data.values()[0].responses;
+            var res = JSON.parse(res).Q0;
+            if (res == "") {
+                alert("Please answer the question");
+                return true;
+            }
+        },
+        on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("margin-top", "200px");
+          $(".jspsych-content").css("max-width", "90%");
+        },
+        on_finish: function (data) {
+            jsPsych.data.addProperties({
+                demand_awareness: JSON.parse(data.responses).Q0,
+            });
+        },
+    };
+
+
+  var influence_awareness = {
+      type: 'survey-multi-choice',
+      questions: [{prompt: "Do you think that the variation on the faces' attractiveness influenced your judgment <u>on the personality traits/outcomes?</u>", options: ['Yes', 'No', 'I do not know'], required: true}],
+      button_label: "Continue",
+      on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("margin-top", "200px");
+          $(".jspsych-content").css("max-width", "90%");
+        },
+      on_finish: function(data) {
+          jsPsych.data.addProperties({
+              influence_awareness: JSON.parse(data.responses)["Q0"],
+          });
+      },
+  };
+
+  var believe_photoshop = {
+      type: 'survey-multi-choice',
+      questions: [{prompt: "Did you believe us when we said that we modified the faces' attractiveness with Adobe Photoshop?", options: ['Yes', 'No', 'I do not know'], required: true}],
+      button_label: "Continue",
+      on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("margin-top", "200px");
+          $(".jspsych-content").css("max-width", "90%");
+        },
+      on_finish: function(data) {
+          jsPsych.data.addProperties({
+              believe_photoshop: JSON.parse(data.responses)["Q0"],
+          });
+      },
+  };
+
+  var demand_compliance = {
+      type: 'survey-multi-choice',
+      questions: [{prompt: "When we asked you to evaluate the faces on the personality traits/outcomes, did you tell us the truth about what you think? Or did you just fake your response (i.e., tell us what you thought we wanted to hear)? Please be honest here (it will not affect payment in any way).", options: ['Yes - I faked my response based on what I thought the researchers wanted to find', 'No - my responses were based on how I genuinely felt', 'I do not know'], required: true}],
+      button_label: "Continue",
+      on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("margin-top", "200px");
+          $(".jspsych-content").css("max-width", "90%");
+        },
+      on_finish: function(data) {
+          jsPsych.data.addProperties({
+              demand_compliance: JSON.parse(data.responses)["Q0"],
+          });
+      },
+  };
+
+ /* AGE */
+  var age = {
+      timeline: [{
+        type: 'survey-text',
+        questions: [{prompt: "How old are you?", rows: 1, columns: 10}],
+        button_label: "Continue",
+      }],
+      on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("margin-top", "200px");
+          $(".jspsych-content").css("max-width", "90%");
+        },
+      loop_function: function(data){ 
+        var age = data.values()[0].responses;
+        var age = JSON.parse(age).Q0; 
+        if(age == ""){
+          alert("Please indicate your age"); 
+          return true; 
+        }
+      },
+      on_finish: function(data) {
+          jsPsych.data.addProperties({
+              age: JSON.parse(data.responses)["Q0"],
+          });
+      },
+  };
+
+  var gender = {
+      type: 'survey-multi-choice',
+      questions: [{prompt: "Please indicate your gender:", options: ['Male', 'Female', 'Other'], required: true}],
+      button_label: "Continue",
+      on_finish: function(data) {
+          jsPsych.data.addProperties({
+              gender: JSON.parse(data.responses)["Q0"],
+          });
+      },
+  };
+
+  var languageOptions = ['Native speaker', 'Very well', 'Well', 'Average', 'Badly', 'Very badly'];
+  var language = {
+        type: 'survey-multi-choice',
+        questions: [{ prompt: "How well do you speak english?", options: languageOptions, required: true }],
+        button_label: "continue",
+        on_finish: function (data) {
+            jsPsych.data.addProperties({
+                language: JSON.parse(data.responses).Q0,
+            });
+            console.log(data);
+        },
+    };
+
+  var Prolific_reported = {
+        timeline: [{
+            type: 'survey-text',
+            questions: [{ prompt: 'Please indicate your Prolific ID:', rows: 3, columns: 60 }],
+            button_label: "continue",
+        }],
+        loop_function: function (data) {
+            var res = data.values()[0].responses;
+            var res = JSON.parse(res).Q0;
+            if (res == "") {
+                alert("Please answer the question");
+                return true;
+            }
+        },
+        on_finish: function (data) {
+            jsPsych.data.addProperties({
+                Prolific_reported: JSON.parse(data.responses).Q0,
+            });
+        },
+    };
+
+  var comments = {
+        timeline: [{
+            type: 'survey-text',
+            questions: [{ prompt: 'Do you have comments regarding this study? [Optional]', rows: 3, columns: 60 }],
+            button_label: "continue",
+        }],
+        on_finish: function (data) {
+            jsPsych.data.addProperties({
+                Comment: JSON.parse(data.responses).Q0,
+            });
+        },
+    };
+
+ /* EXIT FULLSCREEN MODE */
+  var exitFullscreen = {
+    type: 'fullscreen',
+    fullscreen_mode: false
+  };
+
+    /* DEBRIEF */
+  var debrief = [];
+  debrief += "<h1>End of the study</h1>";
+  debrief += "<p class='justify'>Thank you for participating in this online experiment!<br><br>";
+  debrief += "In some experiments, we cannot tell people everything about the experiment at the beginning because their responses would not be ";
+  debrief += "natural. For example, if we told people what the point of the experiment was ahead of time, then some people might do whatever ";
+  debrief += "it is they think we want them to do, just to be helpful. Other people might do the exact opposite of what they think we want "; 
+  debrief += "them to do, just to show us that we cannot figure them out. When people are trying to second-guess what the experiment is "; 
+  debrief += "really about, and they behave a certain way because of it, our results gets messed up. That is because they are not behaving "; 
+  debrief += "like they naturally would in the real world. The whole point of this experiment is to find out how people would ";
+  debrief += "naturally behave.<br><br>";
+  debrief += "Now we would like to explain what we were trying to learn about with this study. First of all, you should know that the aim of "; 
+  debrief += "this study was not to investigate your perception accuracy. Perception accuracy is not a real ability. Instead, our "; 
+  debrief += "aim was to test whether your judgment of the three persons you saw depended on their physical attractiveness."; 
+  debrief += "Individuals tend to attribute many positive qualities to attractive persons. For instance, when a person is attractive, "; 
+  debrief += "people tend to think that s/he is also trustworthy.<br><br>";
+  debrief += "Our specific goal here is to test if this effect (that is called the “attractiveness Halo effect”) disappears "; 
+  debrief += "when people learn that the attractiveness has been modified by photoshop. We believe this should be the case. "; 
+  debrief += "We would like to emphasize that there are no correct responses in this study: We were looking at people’s natural responses. ";
+  debrief += "We hope you understand that we couldn't tell you all of this before because it would have ruined our study. ";
+  debrief += "Again, your responses will be anonymous and will be analyzed as part of a group of responses.</br></br>";
+  debrief += "We hope this explanation was clear. If you want additional information, if you have any questions, or if you would like ";
+  debrief += "to withdraw consent and have your data excluded, do not hesitate to contact us via Prolific Academic. If you are "; 
+  debrief += "interested, you can also ask for the results of this experiment—be aware, however, that this could take several weeks "; 
+  debrief += "to gather all the data we need and to analyze them. <br><br>";
+  debrief += "You can copy this code on Prolific: <b>763C2896</b> ";
+  debrief += "or you can click on the following link to validate your participation:</p>";
+  debrief += "<a href='https://app.prolific.co/submissions/complete?cc=763C2896' target='_blank'>click here</a><br><br>";
+
+
+  /* TIMELINES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+  //timeline.push(consent);
+  timeline.push(activeFullscreen,
+                Quit_expe);
+
+
+switch(Cond_reval) {
+  case "reval":
+    timeline.push(Instr_gene1,
+                  Instr_gene2,
+                  jugmentInst_stim,
+                  judgments_dimensions_part1,
+                  attractiveness_instr_part1,
+                  judgments_attractiveness_part1,
+                  jugmentInst_stim_new_1,
+                  jugmentInst_stim_new_2,
+                  jugmentInst_stim_reval,
+                  jugmentInst_stim_new_3,
+                  jugmentInst_stim3,
+                  judgments_dimensions_part2,
+                  attractiveness_instr_part2,
+                  judgments_attractiveness_part2,
+                  photoshop_memory,
+                  demand_awareness,
+                  influence_awareness,
+                  believe_photoshop,
+                  demand_compliance,
+                  age,
+                  gender,
+                  language,
+                  Prolific_reported,
+                  comments,
+                  exitFullscreen);
+    break;
+  case "no_reval":
+    timeline.push(Instr_gene1,
+                  Instr_gene2,
+                  jugmentInst_stim,
+                  judgments_dimensions_part1,
+                  attractiveness_instr_part1,
+                  judgments_attractiveness_part1,
+                  jugmentInst_stim_new_1,
+                  jugmentInst_stim_new_2,
+                  jugmentInst_stim_halo,
+                  jugmentInst_stim_new_3,
+                  jugmentInst_stim3,
+                  judgments_dimensions_part2,
+                  attractiveness_instr_part2,
+                  judgments_attractiveness_part2,
+                  photoshop_memory,
+                  demand_awareness,
+                  influence_awareness,
+                  believe_photoshop,
+                  demand_compliance,
+                  age,
+                  gender,
+                  language,
+                  Prolific_reported,
+                  comments,
+                  exitFullscreen);
+    break;
+}
+
+  timeline = _.flattenDeep(timeline); // do not remove this!
+  preloadimages = _.flattenDeep(preloadimages);
+
+  /* INITIALISE EXP  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+  jsPsych.init({
+    timeline: timeline,
+    preload_images: preloadimages,
+    max_load_time: 500*1000,
+    exclusions: {
+      min_width: 1100,
+      min_height: 600,
+      max_width: 1600,
+      max_height: 900,
+    },
+    on_finish: function (data) {
+      $("#jspsych-content").html("<img src='https://i.gifer.com/4V0b.gif'>");
+
+
+      /* Initialize Firebase */
+      var config = {
+        apiKey: "AIzaSyAPTEPrT8V9T1-GouWXnW6jknK3brmagJs",
+        databaseURL: "https://postdocgent.firebaseio.com/"
+      };
+
+      firebase.initializeApp(config);
+      var database = firebase.database();
+
+      /* jsPsych: add data to every trial */
+      jsPsych.data.addProperties({
+        jspsych_id: jspsych_id,
+        prolificID: prolificID,
+        Cond_reval: Cond_reval,
+        target_gender: target_gender,
+        totalTime: jsPsych.totalTime()
+      });
+
+      var datarating = data.filter({ task: 'rating' }).csv();
+      var dataattractiveness = data.filter({ task: 'attractiveness' }).csv();
+      var datarevalmemory = data.filter({ task: 'reval_memory' }).csv();
+
+      /* Send data to Firebase */
+      database
+        .ref("feat_reval_3/" + jspsych_id + "/")
+        .update({ datarating })
+        .then(function () {
+      database
+        .ref("feat_reval_3/" + jspsych_id + "/")
+        .update({ dataattractiveness })
+        .then(function () {
+      database
+        .ref("feat_reval_3/" + jspsych_id + "/")
+        .update({ datarevalmemory })
+        .then(function () {
+              console.log("Data sent!");
+              $("#jspsych-content").html(debrief);
+              //setTimeout(jsPsych.data.displayData, 5000);
+                });
+              });
+            });
+    }
+  });
+</script>
+
+</html>
