@@ -908,9 +908,9 @@ var photoshop_memory = [];
 stim_list.map(function(ciImg){
     var likert_trial = {
         type: 'survey-multi-choice',
-        preamble: "Earlier, we told you that we sometimes used the Adobe Photoshop software to modify the attractiveness <br>of the faces. Please, indicate the information we gave you about "+ ciImg.first_name,
+        //preamble: "Earlier, we told you that we sometimes used the Adobe Photoshop software to modify the attractiveness <br>of the faces. Please, indicate the information we gave you about <b>"+ ciImg.first_name+ "</b>:",
         questions: [
-          {prompt: "",  options: photoshop_labels, required: true},
+          {prompt: "Earlier, we told you that we sometimes used the Adobe Photoshop software to modify the attractiveness <br>of the faces. Please, indicate the information we gave you about <b>"+ ciImg.first_name+ "</b>:",  options: photoshop_labels, required: true},
         ],
         randomize_question_order: true, /// !!!! does not work
         button_label: 'Continue',
@@ -936,6 +936,42 @@ stim_list.map(function(ciImg){
         },
     };
     photoshop_memory.push(likert_trial);
+  });
+
+// face-first name memory
+var scaleName = ["Judy", "Ann"];
+
+var Quest_first_name = [];
+stim_list.map(function(ciImg){
+    var likert_trial = {
+        type: 'survey-multi-choice',
+        //preamble: "What is the first name of this person?" + ciImg.imgHtml,
+        questions: [
+          {prompt: "What is the first name of this person?" + ciImg.imgHtml, options: scaleName, required: true},
+        ],
+        button_label: 'Continue',
+        on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("max-width", "100%");
+          $(".jspsych-content").css("margin-top", "430px");
+          $(".jspsych-survey-likert-statement").css("margin", "0px");
+          $(".jspsych-survey-likert-statement").css("padding", "0px");
+          $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
+          $("#jspsych-survey-likert-next").css("margin-top", "10px");
+          $("#jspsych-survey-likert-form").css("width", "800px");
+          $("li").css("width", "9%");
+        //   $("li:first-of-type").css("width", "110px");
+        //   $("li:last-of-type").css("width", "110px");
+        },
+        on_finish: function(data) {
+          data.task = "firstNameMemory";
+          var parsed_response  = JSON.parse(data.responses);
+          data.memory_name    = parsed_response.Q0 * 10;
+          data.facejudged_memory    = ciImg.imgHtml;
+          //data.faceattract              = ciImg.imgHtml;
+        },
+    };
+    Quest_first_name.push(likert_trial);
   });
 
 
@@ -1010,6 +1046,18 @@ stim_list.map(function(ciImg){
       on_finish: function(data) {
           jsPsych.data.addProperties({
               demand_compliance: JSON.parse(data.responses)["Q0"],
+          });
+      },
+  };
+ 
+ /* First name */
+    var first_name_pp = {
+      type: 'survey-multi-choice',
+      questions: [{prompt: "Is your name Ann or Judy?", options: ['Yes (my name is Ann or Judy)', 'No'], required: true}],
+      button_label: "Continue",
+      on_finish: function(data) {
+          jsPsych.data.addProperties({
+              first_name_pp: JSON.parse(data.responses)["Q0"],
           });
       },
   };
@@ -1146,7 +1194,7 @@ switch(Cond_reval) {
     timeline.push(Instr_gene1,
                   Instr_gene2,
                   jugmentInst_stim,
-                  judgments_dimensions_part1,
+                  //judgments_dimensions_part1,
                   attractiveness_instr_part1,
                   judgments_attractiveness_part1,
                   jugmentInst_stim_new_1,
@@ -1154,10 +1202,11 @@ switch(Cond_reval) {
                   jugmentInst_stim_reval,
                   jugmentInst_stim_new_3,
                   jugmentInst_stim3,
-                  judgments_dimensions_part2,
+                 // judgments_dimensions_part2,
                   attractiveness_instr_part2,
-                  judgments_attractiveness_part2,
+                  //judgments_attractiveness_part2,
                   photoshop_memory,
+                  Quest_first_name,
                   demand_awareness,
                   influence_awareness,
                   believe_photoshop,
@@ -1173,7 +1222,7 @@ switch(Cond_reval) {
     timeline.push(Instr_gene1,
                   Instr_gene2,
                   jugmentInst_stim,
-                  judgments_dimensions_part1,
+                  //judgments_dimensions_part1,
                   attractiveness_instr_part1,
                   judgments_attractiveness_part1,
                   jugmentInst_stim_new_1,
@@ -1181,14 +1230,16 @@ switch(Cond_reval) {
                   jugmentInst_stim_halo,
                   jugmentInst_stim_new_3,
                   jugmentInst_stim3,
-                  judgments_dimensions_part2,
+                  //judgments_dimensions_part2,
                   attractiveness_instr_part2,
-                  judgments_attractiveness_part2,
+                  //judgments_attractiveness_part2,
                   photoshop_memory,
+                  Quest_first_name,
                   demand_awareness,
                   influence_awareness,
                   believe_photoshop,
                   demand_compliance,
+                  first_name_pp,
                   age,
                   gender,
                   language,
@@ -1236,6 +1287,7 @@ switch(Cond_reval) {
 
       var datarating = data.filter({ task: 'rating' }).csv();
       var dataattractiveness = data.filter({ task: 'attractiveness' }).csv();
+      var datafirstnamememory = data.filter({ task: 'firstNameMemory' }).csv();
       var datarevalmemory = data.filter({ task: 'reval_memory' }).csv();
 
       /* Send data to Firebase */
@@ -1251,12 +1303,17 @@ switch(Cond_reval) {
         .ref("feat_reval_3/" + jspsych_id + "/")
         .update({ datarevalmemory })
         .then(function () {
+      database
+        .ref("feat_reval_3/" + jspsych_id + "/")
+        .update({ datafirstnamememory })
+        .then(function () {
               console.log("Data sent!");
               $("#jspsych-content").html(debrief);
               //setTimeout(jsPsych.data.displayData, 5000);
                 });
               });
             });
+        });
     }
   });
 </script>
