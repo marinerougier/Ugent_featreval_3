@@ -82,6 +82,8 @@
   // Wde only keep the female target because the photoshop examples does not work very well for male targets
   var target_gender = jsPsych.randomization.sampleWithoutReplacement(["target_female"], 1)[0];
   //var target_gender = jsPsych.randomization.sampleWithoutReplacement(["target_male", "target_female"], 1)[0];
+  // Picture associated with the Judy vs. Ann first name
+  var Name_face   = jsPsych.randomization.sampleWithoutReplacement(["high_Judy", "high_Sara"], 1)[0];
 
   var Cond_reval = jsPsych.data.getURLVariable("Cond_reval");
   if(Cond_reval == null) {Cond_reval = jsPsych.randomization.sampleWithoutReplacement(["reval", "no_reval"], 1)[0];}
@@ -133,17 +135,19 @@ if (target_gender == "target_male"){
   preloadimages.push(stim_high);
   preloadimages.push(stim_low);
 
-  // Judy vs. Ann first name
-  var Name_face   = ["Judy", "Ann"];
-  Name_face = _.shuffle(Name_face); 
-
   var stim_list = [
-  {imgHtml: "<img class='imgJudge' src='" +stim_high+ "'>", first_name: Name_face[0]},
-  {imgHtml: "<img class='imgJudge' src='" +stim_low+ "'>", first_name: Name_face[1]}
+  {imgHtml: "<img class='imgJudge' src='" +stim_high+ "'>"},
+  {imgHtml: "<img class='imgJudge' src='" +stim_low+ "'>"}
   ]
 
   stim_list = _.flattenDeep(stim_list);
   stim_list = _.shuffle(stim_list); // randomize order
+
+  var Facelist = _.flattenDeep([stim_high, stim_low]);
+  preloadimages.push(Facelist);
+  Facelist = _.shuffle(Facelist); // randomize order
+
+  FaceStims = Facelist.map(function(e) {return {imgHtml: "<img class='imgJudge' src='" + e + "'>"}});
 
 
 // Faces that are used in example in the instructions
@@ -259,23 +263,13 @@ var consent = {
     stimulus: function() {
       var html = "";
       html += "<h1>Study of accuracy in person perception: Part 1/2</h1>";
-      html += "<p class='justify'>In this first part, your task is to <b>report several judgments on the two persons presented below.</b> ";
-      html += "<p class='instructions'><table style='margin-left:auto;margin-right:auto'>" ;
-      html += "<tr>" ;
-      html += "<th>This is <u>"+ Name_face[1]+"</u>:</th>" ;
-      html += "<th width='120px'> </th>" ;
-      html += "<th>This is <u>"+ Name_face[0]+"</u>:</th>" ;
-      html += "</tr>" ;
-      html += "<tr>" ;
-      html += "<td><img class='imgInstr' src='" + stim_low + "'></td>" ;
-      html += "<th width='120px'> </th>" ;
-      html += "<td><img class='imgInstr' src='" + stim_high  + "'></td>" ;
-      html += "</tr>" ;
-      html += "</table></p>" ;
-      html += "<p class='justify'>You will evaluate each person on <b>42 personality traits or personality outcomes. Note that it is extremely important that you <b><u>memorize which face belongs to "+ Name_face[1] +" and "+ Name_face[0] +" because faces will not be displayed during evaluation.</u></b> </b><br><br>";
-      html += "Given that this study is on person perception, <b>we are not interested in your tact, politeness, or other ";
-      html += "factors </b>that are usually important in everyday life situations. </br>";
-      html += "Please, try to answer <b> as honestly and as spontaneously as possible.</b></br></br>";
+      html += "<p class='justify'>In this first part, your task is to <b>report several judgments on the two persons presented below:</b> ";
+      html += "<center><img class='imgInstr' src='" + Facelist[0] + "'>      "
+      html += "<img class='imgInstr' src='" + Facelist[1]  + "'>      <br></center>"
+      html += "<p class='justify'>To do so, you will evaluate each person on <b>42 personality traits or personality outcomes. </b><br><br>";
+      html += "<b>Given that this study is on person perception, we are not interested in your tact, politeness, or other ";
+      html += "factors that are usually important in everyday life situations. </br>";
+      html += "It is extremely important that you try to answer <b> as honestly and as spontaneously as possible.</b></br></br>";
       html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
       return html;
     },
@@ -289,15 +283,15 @@ var consent = {
     stimulus: function() {
       var html = "";
       html += "<h1>Study of accuracy in person perception: Part 2/2</h1>";
-      html += "<p class='justify'>Part 1 is now over. <br><br>Before going further, you should know that <b>the photographs of you just saw ";
-      html+= "may not be representative of how "+ Name_face[1] +" and "+ Name_face[0] +" look like in reality</b>. Indeed, <b><u>we intentionally photoshopped (with the Adobe ";
+      html += "<p class='justify'>Part 1 is now over. <br><br>Before going further, you should know that <b>the photographs you just saw ";
+      html+= "may not be representative of how these people look like in reality</b>. Indeed, <b><u>sometimes we intentionally photoshopped (with the Adobe ";
       html+= "Photoshop software) the persons on the pictures so that they appear more or less attractive than they are in reality.</u></b> ";
       html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
       return html;
     },
       on_load: function() {
           window.scrollTo(0, 0);
-          $(".jspsych-content").css("margin-top", "auto");
+          $(".jspsych-content").css("margin-top", "150px");
           $(".jspsych-content").css("max-width", "90%");
         },
   };
@@ -333,7 +327,7 @@ var consent = {
     },
     on_load: function() {
           window.scrollTo(0, 0);
-          $(".jspsych-content").css("margin-top", "auto");
+          $(".jspsych-content").css("margin-top", "50px");
           $(".jspsych-content").css("max-width", "90%");
         },
   };
@@ -346,26 +340,21 @@ var jugmentInst_stim_reval = {
     stimulus: function() {
       var html = "";
       html += "<h1>Study of accuracy in person perception: Part 2/2</h1>";
-      html += "<p class='justify'>Now, here is the Photoshop information regarding "+ Name_face[1] +" and "+ Name_face[0] +" we presented you before: </b><br> ";
+      html += "<p class='justify'>Now, here is the Photoshop information regarding the two faces we presented you before: </b><br> ";
       html += "<p class='instructions'><table style='margin-left:auto;margin-right:auto'>" ;
       html += "<tr>" ;
       html += "<td><img class='imgInstr2' src='" + stim_low + "'></td>" ;
-      html += "<td>We <b><u>decreased</u> the physical attractiveness of <u>"+ Name_face[1]+"</b></u>. This means that <b>in reality "+ Name_face[1]+" is more attractive</b> than she appears to be on the present picture.</td>" ;
+      html += "<td>We <b><u>decreased</u> the physical attractiveness</b> of this person. This means that <b>in reality this person is more attractive</b> than she appears to be on the present picture.</td>" ;
       html += "</tr>" ;
       html += "<tr>" ;
       html += "<td><img class='imgInstr2' src='" + stim_high + "'></td>" ;
-      html += "<td>We <b><u>increased</u> the physical attractiveness of <u>"+ Name_face[0]+"</b></u>. This means that <b>in reality "+ Name_face[0]+" is less attractive</b> than she appears to be on the picture.</td>" ;
+      html += "<td>We <b><u>increased</u> the physical attractiveness</b> of this person. This means that <b>in reality this person is less attractive</b> than she appears to be on the picture.</td>" ;
       html += "</tr>" ;
       html += "</table></p>" ;
       html += "<p class='justify'><b><u><center>Please, make sure to read carefully and memorize the information above!</b></u></center><br> ";
       html += "<p>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
       return html;
     },
-      on_load: function() {
-          window.scrollTo(0, 0);
-          $(".jspsych-content").css("margin-top", "auto");
-          $(".jspsych-content").css("max-width", "90%");
-        },
   };
 
 
@@ -376,26 +365,21 @@ var jugmentInst_stim_halo = {
     stimulus: function() {
       var html = "";
       html += "<h1>Study of accuracy in person perception: Part 2/2</h1>";
-      html += "<p class='justify'>Now, here is the Photoshop information regarding "+ Name_face[1] +" and "+ Name_face[0] +" we presented you before: </b><br> ";
+      html += "<p class='justify'>Now, here is the Photoshop information regarding the two faces we presented you before: </b><br> ";
       html += "<p class='instructions'><table style='margin-left:auto;margin-right:auto'>" ;
       html += "<tr>" ;
       html += "<td><img class='imgInstr2' src='" + stim_low + "'></td>" ;
-      html += "<td>We <b><u>increased</u> the physical attractiveness of <u>"+ Name_face[1]+"</b></u>. This means that <b>in reality "+ Name_face[1]+" is less attractive</b> than she appears to be on the picture.</td>" ;
+      html += "<td>We <b><u>increased</u> the physical attractiveness</b> of this person. This means that <b>in reality this person is less attractive</b> than she appears to be on the picture.</td>" ;
       html += "</tr>" ;
       html += "<tr>" ;
       html += "<td><img class='imgInstr2' src='" + stim_high + "'></td>" ;
-      html += "<td>We <b><u>decreased</u> the physical attractiveness of <u>"+ Name_face[0]+"</b></u>. This means that <b>in reality "+ Name_face[0]+" is more attractive</b> than she appears to be on the present picture.</td>" ;
+      html += "<td>We <b><u>decreased</u> the physical attractiveness</b> of this person. This means that <b>in reality this person is more attractive</b> than she appears to be on the present picture.</td>" ;
       html += "</tr>" ;
       html += "</table></p>" ;
       html += "<p class='justify'><b><u><center>Please, make sure to read carefully and memorize the information above!</b></u></center><br> ";
       html += "<p>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
       return html;
     },
-      on_load: function() {
-          window.scrollTo(0, 0);
-          $(".jspsych-content").css("margin-top", "auto");
-          $(".jspsych-content").css("max-width", "90%");
-        },
   };
 
   var jugmentInst_stim_new_3 = {
@@ -405,28 +389,13 @@ var jugmentInst_stim_halo = {
     stimulus: function() {
       var html = "";
       html += "<h1>Study of accuracy in person perception: Part 2/2</h1>";
-      html += "<p class='justify'>Based on the photoshopped examples we showed you earlier, <b><u>try to picture how "+ Name_face[1] +" and "+ Name_face[0] +" look like ";
-      html += "in real life</u> and take a few moments to form an impression on them. </b>Keep in mind that faces will not be displayed during evaluation.<br> ";
-      html += "<p class='instructions'><table style='margin-left:auto;margin-right:auto'>" ;
-      html += "<tr>" ;
-      html += "<td><img class='imgInstr' src='" + stim_low + "'></td>" ;
-      html += "<th width='120px'> </th>" ;
-      html += "<td><img class='imgInstr' src='" + stim_high  + "'></td>" ;
-      html += "</tr>" ;
-      html += "<tr>" ;
-      html += "<th>"+ Name_face[1]+"</u></th>" ;
-      html += "<th width='120px'> </th>" ;
-      html += "<th>"+ Name_face[0]+"</u></th>" ;
-      html += "</tr>" ;
-      html += "</table></p>" ;
+      html += "<p class='justify'>Based on the photoshopped examples we showed you earlier, <b><u>try to picture how these persons look like ";
+      html += "in real life</u> and take a few moments to <b>form an impression on them.</b><br> ";
+      html += "<center><img class='imgInstr' src='" + Facelist[0] + "'>      "
+      html += "<img class='imgInstr' src='" + Facelist[1]  + "'>      <br></center>"
       html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
       return html;
     },
-    on_load: function() {
-          window.scrollTo(0, 0);
-          $(".jspsych-content").css("margin-top", "auto");
-          $(".jspsych-content").css("max-width", "90%");
-        },
   };
 
 
@@ -437,19 +406,14 @@ var jugmentInst_stim_halo = {
     stimulus: function() {
       var html = "";
       html += "<h1>Study of accuracy in person perception: Part 2/2</h1>";
-      html += "<p class='justify'>As in the first part of the study, you will now evaluate "+ Name_face[1] +" and "+ Name_face[0] +" on the same <b>42 personality traits/outcomes. </b>";
-      //html += "To answer, <b>keep in mind the information we gave you before regarding how we photoshopped the photographs.</b><br><br>";
-      html += "Again, remember that <b>we are not interested in your tact, politeness, or other ";
-      html += "factors </b>that are usually important in everyday life situations. </br>";
-      html += "Please, try to answer <b> as honestly and as spontaneously as possible.</b></br></br>";
+      html += "<p class='justify'>As in the first part of the study, you will now evaluate each person on the same <b>42 personality traits/outcomes. </b>";
+      html += "To answer, <b>keep in mind the information we gave you before regarding how we photoshopped the photographs.</b><br><br>";
+      html += "<p class='justify'><b>Given that this study is on person perception, we are not interested in your tact, politeness, or other ";
+      html += "factors that are usually important in everyday life situations. </br>";
+      html += "It is extremely important that you try to answer <b> as honestly and as spontaneously as possible.</b></br></br>";
       html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
       return html;
     },
-        on_load: function() {
-          window.scrollTo(0, 0);
-          $(".jspsych-content").css("margin-top", "auto");
-          $(".jspsych-content").css("max-width", "90%");
-        },
   };
 
   /* Attractiveness INSTRUCTIONS */
@@ -460,16 +424,16 @@ var jugmentInst_stim_halo = {
     stimulus: function() {
       var html = "";
       html += "<h1>Study of accuracy in person perception: Part 1/2 </h1>";
-      html += "<p class='justify'>Now, we will ask you to rate "+ Name_face[1] +" and "+ Name_face[0] +" on their <b>physical attractiveness</b>.<br><br> ";
-      html += "Again, remember that <b>we are not interested in your tact, politeness, or other ";
-      html += "factors </b>that are usually important in everyday life situations. </br>";
-      html += "Please, try to answer <b> as honestly and as spontaneously as possible.</b></br></br>";
+      html += "<p class='justify'>Now, we will ask you to rate the two faces that you saw on their <b>physical attractiveness</b>.<br><br> ";
+      html += "<b>Again, remember that we are not interested in your tact, politeness, or other ";
+      html += "factors that are usually important in everyday life situations. </br>";
+      html += "It is extremely important that you try to answer <b> as honestly and as spontaneously as possible.</b></br></br>";
       html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
       return html;
     },
       on_load: function() {
           window.scrollTo(0, 0);
-          $(".jspsych-content").css("margin-top", "auto");
+          $(".jspsych-content").css("margin-top", "200px");
           $(".jspsych-content").css("max-width", "90%");
         },
   };
@@ -481,16 +445,16 @@ var jugmentInst_stim_halo = {
     stimulus: function() {
       var html = "";
       html += "<h1>Study of accuracy in person perception: Part 2/2 </h1>";
-      html += "<p class='justify'>As in the first part of the study, we will ask you to rate "+ Name_face[1] +" and "+ Name_face[0] +" on their <b>physical attractiveness</b>.<br><br> ";
-      html += "Again, remember that <b>we are not interested in your tact, politeness, or other ";
-      html += "factors </b>that are usually important in everyday life situations. </br>";
-      html += "Please, try to answer <b> as honestly and as spontaneously as possible.</b></br></br>";
+      html += "<p class='justify'>As in the first part of the study, we will ask you to rate the two faces that you saw on their <b>physical attractiveness</b>.<br><br> ";
+      html += "<b>Again, remember that we are not interested in your tact, politeness, or other ";
+      html += "factors that are usually important in everyday life situations. </br>";
+      html += "It is extremely important that you try to answer <b> as honestly and as spontaneously as possible.</b></br></br>";
       html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
       return html;
     },
       on_load: function() {
           window.scrollTo(0, 0);
-          $(".jspsych-content").css("margin-top", "auto");
+          $(".jspsych-content").css("margin-top", "200px");
           $(".jspsych-content").css("max-width", "90%");
         },
   };
@@ -589,7 +553,7 @@ var jugmentInst_stim_halo = {
   stim_list.map(function(ciImg){
     var likert_trial = {
         type: 'survey-likert',
-        preamble: "Evaluate <b><u>" + ciImg.first_name + "</u></b> on the following personality traits and outcomes: <br><br>",
+        preamble: "<img class='imgBack' src='Stim_selected/Fond_blanc.jpeg'>" + ciImg.imgHtml,
         randomize_order: true,
         questions: [
           {prompt: "", labels: scaleSociable, required: true},
@@ -642,7 +606,7 @@ var jugmentInst_stim_halo = {
         on_load: function() {
           window.scrollTo(0, 0);
           $(".jspsych-content").css("max-width", "100%");
-          $(".jspsych-content").css("margin-top", "150px");
+          $(".jspsych-content").css("margin-top", "430px");
           $(".jspsych-survey-likert-statement").css("margin", "0px");
           $(".jspsych-survey-likert-statement").css("padding", "0px");
           $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
@@ -698,7 +662,6 @@ var jugmentInst_stim_halo = {
           data.prudish_part1       = parsed_response.Q40 * 10;
           data.boastfull_part1     = parsed_response.Q41 * 10;
           data.facejudged_part1    = ciImg.imgHtml;
-          data.firstname_part1     = ciImg.first_name;
         },
     };
     judgments_dimensions_part1.push(likert_trial);
@@ -708,7 +671,7 @@ var jugmentInst_stim_halo = {
   stim_list.map(function(ciImg){
     var likert_trial = {
         type: 'survey-likert',
-        preamble: "Evaluate <b><u>" + ciImg.first_name + "</u></b> on the following personality traits and outcomes: <br><br>",
+        preamble: "<img class='imgBack' src='Stim_selected/Fond_blanc.jpeg'>" + ciImg.imgHtml,
         randomize_order: true,
         questions: [
           {prompt: "", labels: scaleSociable, required: true},
@@ -761,7 +724,7 @@ var jugmentInst_stim_halo = {
         on_load: function() {
           window.scrollTo(0, 0);
           $(".jspsych-content").css("max-width", "100%");
-          $(".jspsych-content").css("margin-top", "150px");
+          $(".jspsych-content").css("margin-top", "430px");
           $(".jspsych-survey-likert-statement").css("margin", "0px");
           $(".jspsych-survey-likert-statement").css("padding", "0px");
           $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
@@ -817,7 +780,6 @@ var jugmentInst_stim_halo = {
           data.prudish_part2       = parsed_response.Q40 * 10;
           data.boastfull_part2     = parsed_response.Q41 * 10;
           data.facejudged_part2    = ciImg.imgHtml;
-          data.firstname_part2     = ciImg.first_name;
         },
     };
     judgments_dimensions_part2.push(likert_trial);
@@ -827,10 +789,10 @@ var jugmentInst_stim_halo = {
 var scaleAttractiveness = ["-3</br>Extremely unattractive", "-2", "-1", "0", "1", "2", "3</br>Extremely attractive"];
 
 var judgments_attractiveness_part1 = [];
-stim_list.map(function(ciImg){
+FaceStims.map(function(ciImg){
     var likert_trial = {
         type: 'survey-likert',
-        preamble: "Evaluate <b><u>" + ciImg.first_name + "</u></b> on her physical attractiveness: <br><br>",
+        preamble: "<img class='imgBack' src='Stim_selected/Fond_blanc.jpeg'>" + ciImg.imgHtml,
         questions: [
           {prompt: "", labels: scaleAttractiveness, required: true},
         ],
@@ -839,7 +801,7 @@ stim_list.map(function(ciImg){
         on_load: function() {
           window.scrollTo(0, 0);
           $(".jspsych-content").css("max-width", "100%");
-          $(".jspsych-content").css("margin-top", "150px");
+          $(".jspsych-content").css("margin-top", "430px");
           $(".jspsych-survey-likert-statement").css("margin", "0px");
           $(".jspsych-survey-likert-statement").css("padding", "0px");
           $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
@@ -854,7 +816,6 @@ stim_list.map(function(ciImg){
           var parsed_response  = JSON.parse(data.responses);
           data.attractiveness_part1    = parsed_response.Q0 * 10;
           data.facejudged_part1    = ciImg.imgHtml;
-          data.firstname_part1     = ciImg.first_name;
           //data.faceattract              = ciImg.imgHtml;
         },
     };
@@ -862,10 +823,10 @@ stim_list.map(function(ciImg){
   });
 
 var judgments_attractiveness_part2 = [];
-stim_list.map(function(ciImg){
+FaceStims.map(function(ciImg){
     var likert_trial = {
         type: 'survey-likert',
-        preamble: "Evaluate <b><u>" + ciImg.first_name + "</u></b> on her physical attractiveness: <br><br>",
+        preamble: "<img class='imgBack' src='Stim_selected/Fond_blanc.jpeg'>" + ciImg.imgHtml,
         questions: [
           {prompt: "", labels: scaleAttractiveness, required: true},
         ],
@@ -874,7 +835,7 @@ stim_list.map(function(ciImg){
         on_load: function() {
           window.scrollTo(0, 0);
           $(".jspsych-content").css("max-width", "100%");
-          $(".jspsych-content").css("margin-top", "150px");
+          $(".jspsych-content").css("margin-top", "430px");
           $(".jspsych-survey-likert-statement").css("margin", "0px");
           $(".jspsych-survey-likert-statement").css("padding", "0px");
           $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
@@ -889,7 +850,6 @@ stim_list.map(function(ciImg){
           var parsed_response  = JSON.parse(data.responses);
           data.attractiveness_part2    = parsed_response.Q0 * 10;
           data.facejudged_part2    = ciImg.imgHtml;
-          data.firstname_part2     = ciImg.first_name;
           //data.faceattract              = ciImg.imgHtml;
         },
     };
@@ -905,19 +865,19 @@ var photoshop_labels = ["we increased the physical attractiveness", "we decrease
 
 // Judgments on attractiveness
 var photoshop_memory = [];
-stim_list.map(function(ciImg){
+FaceStims.map(function(ciImg){
     var likert_trial = {
         type: 'survey-multi-choice',
-        preamble: "Earlier, we told you that we sometimes used the Adobe Photoshop software to modify the attractiveness <br>of the faces. Please, indicate the information we gave you about "+ ciImg.first_name,
+        preamble: "<img class='imgBack' src='Stim_selected/Fond_blanc.jpeg'>" + ciImg.imgHtml,
         questions: [
-          {prompt: "",  options: photoshop_labels, required: true},
+          {prompt: "Earlier, we told you that we sometimes used the Adobe Photoshop software to modify the attractiveness <br>of the faces. Please, indicate the information we gave you about this specific person: ",  options: photoshop_labels, required: true},
         ],
         randomize_question_order: true, /// !!!! does not work
         button_label: 'Continue',
         on_load: function() {
           window.scrollTo(0, 0);
           $(".jspsych-content").css("max-width", "100%");
-          $(".jspsych-content").css("margin-top", "150px");
+          $(".jspsych-content").css("margin-top", "350px");
           $(".jspsych-survey-likert-statement").css("margin", "0px");
           $(".jspsych-survey-likert-statement").css("padding", "0px");
           $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
