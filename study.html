@@ -289,7 +289,7 @@ var consent = {
     stimulus: function() {
       var html = "";
       html += "<h1>Study of accuracy in person perception: Part 2/2</h1>";
-      html += "<p class='justify'>Part 1 is now over. <br><br>Before going further, you should know that <b>the photographs of you just saw ";
+      html += "<p class='justify'>Part 1 is now over. <br><br>Before going further, you should know that <b>the photographs you just saw ";
       html+= "may not be representative of how "+ Name_face[1] +" and "+ Name_face[0] +" look like in reality</b>. Indeed, <b><u>we intentionally photoshopped (with the Adobe ";
       html+= "Photoshop software) the persons on the pictures so that they appear more or less attractive than they are in reality.</u></b> ";
       html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
@@ -406,7 +406,7 @@ var jugmentInst_stim_halo = {
       var html = "";
       html += "<h1>Study of accuracy in person perception: Part 2/2</h1>";
       html += "<p class='justify'>Based on the photoshopped examples we showed you earlier, <b><u>try to picture how "+ Name_face[1] +" and "+ Name_face[0] +" look like ";
-      html += "in real life</u> and take a few moments to form an impression on them. </b>Keep in mind that faces will not be displayed during evaluation.<br> ";
+      html += "in real life</u> and take a few moments to form an impression on them. </b>Again, keep in mind that faces will not be displayed during evaluation.<br> ";
       html += "<p class='instructions'><table style='margin-left:auto;margin-right:auto'>" ;
       html += "<tr>" ;
       html += "<td><img class='imgInstr' src='" + stim_low + "'></td>" ;
@@ -437,7 +437,7 @@ var jugmentInst_stim_halo = {
     stimulus: function() {
       var html = "";
       html += "<h1>Study of accuracy in person perception: Part 2/2</h1>";
-      html += "<p class='justify'>As in the first part of the study, you will now evaluate "+ Name_face[1] +" and "+ Name_face[0] +" on the same <b>42 personality traits/outcomes. </b>";
+      html += "<p class='justify'>As in the first part of the study, you will now evaluate "+ Name_face[1] +" and "+ Name_face[0] +" on the same <b>42 personality traits/outcomes. </b><br><br>";
       //html += "To answer, <b>keep in mind the information we gave you before regarding how we photoshopped the photographs.</b><br><br>";
       html += "Again, remember that <b>we are not interested in your tact, politeness, or other ";
       html += "factors </b>that are usually important in everyday life situations. </br>";
@@ -961,8 +961,9 @@ stim_list.map(function(ciImg){
         },
         on_finish: function(data) {
           data.task = "firstNameMemory";
-          var parsed_response  = JSON.parse(data.responses);
-          data.memory_name    = parsed_response.Q0 * 10;
+          //var parsed_response  = JSON.parse(data.responses);
+          //data.memory_name    = parsed_response.Q0;
+          data.memory_name    = JSON.parse(data.responses)["Q0"];
           data.facejudged_memory    = ciImg.imgHtml;
           //data.faceattract              = ciImg.imgHtml;
         },
@@ -1162,7 +1163,7 @@ stim_list.map(function(ciImg){
   debrief += "naturally behave.<br><br>";
   debrief += "Now we would like to explain what we were trying to learn about with this study. First of all, you should know that the aim of "; 
   debrief += "this study was not to investigate your perception accuracy. Perception accuracy is not a real ability. Instead, our "; 
-  debrief += "aim was to test whether your judgment of the two persons you saw depended on their physical attractiveness."; 
+  debrief += "aim was to test whether your judgment of the two persons you saw depended on their physical attractiveness. "; 
   debrief += "Individuals tend to attribute many positive qualities to attractive persons. For instance, when a person is attractive, "; 
   debrief += "people tend to think that s/he is also trustworthy.<br><br>";
   debrief += "Our specific goal here is to test if this effect (that is called the “attractiveness Halo effect”) disappears "; 
@@ -1207,6 +1208,7 @@ switch(Cond_reval) {
                   influence_awareness,
                   believe_photoshop,
                   demand_compliance,
+                  first_name_pp,
                   age,
                   gender,
                   language,
