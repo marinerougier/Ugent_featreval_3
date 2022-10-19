@@ -651,52 +651,52 @@ var jugmentInst_stim_halo = {
         //   $("li:last-of-type").css("width", "110px");
         },
         on_finish: function(data) {
-          data.task = "rating_part1";
+          data.task = "rating";
           var parsed_response  = JSON.parse(data.responses);
-          data.sociable      = parsed_response.Q0 * 10;
-          data.funloving     = parsed_response.Q1 * 10;
-          data.likable       = parsed_response.Q2 * 10;
-          data.popular       = parsed_response.Q3 * 10;
-          data.intelligent   = parsed_response.Q4 * 10;
-          data.skillful      = parsed_response.Q5 * 10;
-          data.rational      = parsed_response.Q6 * 10;
-          data.scientific    = parsed_response.Q7 * 10;
-          data.ambitious     = parsed_response.Q8 * 10;
-          data.hardworking   = parsed_response.Q9 * 10;
-          data.grade         = parsed_response.Q10 * 10;
-          data.success       = parsed_response.Q11 * 10;
-          data.sensitive     = parsed_response.Q12 * 10;
-          data.empathic      = parsed_response.Q13 * 10;
-          data.compassionate = parsed_response.Q14 * 10;
-          data.generous      = parsed_response.Q15 * 10;
-          data.modest        = parsed_response.Q16 * 10;
-          data.egoistic      = parsed_response.Q17 * 10;
-          data.trustworthy   = parsed_response.Q18 * 10;
-          data.honest        = parsed_response.Q19 * 10;
-          data.faithful      = parsed_response.Q20 * 10;
-          data.normal        = parsed_response.Q21 * 10;
-          data.welladjusted  = parsed_response.Q22 * 10;
-          data.satisfied     = parsed_response.Q23 * 10;
-          data.happy         = parsed_response.Q24 * 10;
-          data.confident     = parsed_response.Q25 * 10;
-          data.selfregard    = parsed_response.Q26 * 10;
-          data.mature        = parsed_response.Q27 * 10;
-          data.healthy       = parsed_response.Q28 * 10;
-          data.strong        = parsed_response.Q29 * 10;
-          data.selfassertive = parsed_response.Q30 * 10;
-          data.dominant      = parsed_response.Q31 * 10;
-          data.leader        = parsed_response.Q32 * 10;
-          data.vain          = parsed_response.Q33 * 10;
-          data.elitist       = parsed_response.Q34 * 10;
-          data.snobbish      = parsed_response.Q35 * 10;
-          data.shallow       = parsed_response.Q36 * 10;
-          data.humble        = parsed_response.Q37 * 10;
-          data.materialistic = parsed_response.Q38 * 10;
-          data.pompous       = parsed_response.Q39 * 10;
-          data.prudish       = parsed_response.Q40 * 10;
-          data.boastfull     = parsed_response.Q41 * 10;
-          data.facejudged    = ciImg.imgHtml;
-          data.firstname     = ciImg.first_name;
+          data.sociable_part1      = parsed_response.Q0 * 10;
+          data.funloving_part1     = parsed_response.Q1 * 10;
+          data.likable_part1       = parsed_response.Q2 * 10;
+          data.popular_part1       = parsed_response.Q3 * 10;
+          data.intelligent_part1   = parsed_response.Q4 * 10;
+          data.skillful_part1      = parsed_response.Q5 * 10;
+          data.rational_part1      = parsed_response.Q6 * 10;
+          data.scientific_part1    = parsed_response.Q7 * 10;
+          data.ambitious_part1     = parsed_response.Q8 * 10;
+          data.hardworking_part1   = parsed_response.Q9 * 10;
+          data.grade_part1         = parsed_response.Q10 * 10;
+          data.success_part1       = parsed_response.Q11 * 10;
+          data.sensitive_part1     = parsed_response.Q12 * 10;
+          data.empathic_part1      = parsed_response.Q13 * 10;
+          data.compassionate_part1 = parsed_response.Q14 * 10;
+          data.generous_part1      = parsed_response.Q15 * 10;
+          data.modest_part1        = parsed_response.Q16 * 10;
+          data.egoistic_part1      = parsed_response.Q17 * 10;
+          data.trustworthy_part1   = parsed_response.Q18 * 10;
+          data.honest_part1        = parsed_response.Q19 * 10;
+          data.faithful_part1      = parsed_response.Q20 * 10;
+          data.normal_part1        = parsed_response.Q21 * 10;
+          data.welladjusted_part1  = parsed_response.Q22 * 10;
+          data.satisfied_part1     = parsed_response.Q23 * 10;
+          data.happy_part1         = parsed_response.Q24 * 10;
+          data.confident_part1     = parsed_response.Q25 * 10;
+          data.selfregard_part1    = parsed_response.Q26 * 10;
+          data.mature_part1        = parsed_response.Q27 * 10;
+          data.healthy_part1       = parsed_response.Q28 * 10;
+          data.strong_part1        = parsed_response.Q29 * 10;
+          data.selfassertive_part1 = parsed_response.Q30 * 10;
+          data.dominant_part1      = parsed_response.Q31 * 10;
+          data.leader_part1        = parsed_response.Q32 * 10;
+          data.vain_part1          = parsed_response.Q33 * 10;
+          data.elitist_part1       = parsed_response.Q34 * 10;
+          data.snobbish_part1      = parsed_response.Q35 * 10;
+          data.shallow_part1       = parsed_response.Q36 * 10;
+          data.humble_part1        = parsed_response.Q37 * 10;
+          data.materialistic_part1 = parsed_response.Q38 * 10;
+          data.pompous_part1       = parsed_response.Q39 * 10;
+          data.prudish_part1       = parsed_response.Q40 * 10;
+          data.boastfull_part1     = parsed_response.Q41 * 10;
+          data.facejudged_part1    = ciImg.imgHtml;
+          data.firstname_part1     = ciImg.first_name;
         },
     };
     judgments_dimensions_part1.push(likert_trial);
@@ -768,52 +768,52 @@ var jugmentInst_stim_halo = {
         //   $("li:last-of-type").css("width", "110px");
         },
         on_finish: function(data) {
-          data.task = "rating_part2";
+          data.task = "rating";
           var parsed_response  = JSON.parse(data.responses);
-          data.sociable      = parsed_response.Q0 * 10;
-          data.funloving     = parsed_response.Q1 * 10;
-          data.likable       = parsed_response.Q2 * 10;
-          data.popular       = parsed_response.Q3 * 10;
-          data.intelligent   = parsed_response.Q4 * 10;
-          data.skillful      = parsed_response.Q5 * 10;
-          data.rational      = parsed_response.Q6 * 10;
-          data.scientific    = parsed_response.Q7 * 10;
-          data.ambitious     = parsed_response.Q8 * 10;
-          data.hardworking   = parsed_response.Q9 * 10;
-          data.grade         = parsed_response.Q10 * 10;
-          data.success       = parsed_response.Q11 * 10;
-          data.sensitive     = parsed_response.Q12 * 10;
-          data.empathic      = parsed_response.Q13 * 10;
-          data.compassionate = parsed_response.Q14 * 10;
-          data.generous      = parsed_response.Q15 * 10;
-          data.modest        = parsed_response.Q16 * 10;
-          data.egoistic      = parsed_response.Q17 * 10;
-          data.trustworthy   = parsed_response.Q18 * 10;
-          data.honest        = parsed_response.Q19 * 10;
-          data.faithful      = parsed_response.Q20 * 10;
-          data.normal        = parsed_response.Q21 * 10;
-          data.welladjusted  = parsed_response.Q22 * 10;
-          data.satisfied     = parsed_response.Q23 * 10;
-          data.happy         = parsed_response.Q24 * 10;
-          data.confident     = parsed_response.Q25 * 10;
-          data.selfregard    = parsed_response.Q26 * 10;
-          data.mature        = parsed_response.Q27 * 10;
-          data.healthy       = parsed_response.Q28 * 10;
-          data.strong        = parsed_response.Q29 * 10;
-          data.selfassertive = parsed_response.Q30 * 10;
-          data.dominant      = parsed_response.Q31 * 10;
-          data.leader        = parsed_response.Q32 * 10;
-          data.vain          = parsed_response.Q33 * 10;
-          data.elitist       = parsed_response.Q34 * 10;
-          data.snobbish      = parsed_response.Q35 * 10;
-          data.shallow       = parsed_response.Q36 * 10;
-          data.humble        = parsed_response.Q37 * 10;
-          data.materialistic = parsed_response.Q38 * 10;
-          data.pompous       = parsed_response.Q39 * 10;
-          data.prudish       = parsed_response.Q40 * 10;
-          data.boastfull     = parsed_response.Q41 * 10;
-          data.facejudged    = ciImg.imgHtml;
-          data.firstname     = ciImg.first_name;
+          data.sociable_part2      = parsed_response.Q0 * 10;
+          data.funloving_part2     = parsed_response.Q1 * 10;
+          data.likable_part2       = parsed_response.Q2 * 10;
+          data.popular_part2       = parsed_response.Q3 * 10;
+          data.intelligent_part2   = parsed_response.Q4 * 10;
+          data.skillful_part2      = parsed_response.Q5 * 10;
+          data.rational_part2      = parsed_response.Q6 * 10;
+          data.scientific_part2    = parsed_response.Q7 * 10;
+          data.ambitious_part2     = parsed_response.Q8 * 10;
+          data.hardworking_part2   = parsed_response.Q9 * 10;
+          data.grade_part2         = parsed_response.Q10 * 10;
+          data.success_part2       = parsed_response.Q11 * 10;
+          data.sensitive_part2     = parsed_response.Q12 * 10;
+          data.empathic_part2      = parsed_response.Q13 * 10;
+          data.compassionate_part2 = parsed_response.Q14 * 10;
+          data.generous_part2      = parsed_response.Q15 * 10;
+          data.modest_part2        = parsed_response.Q16 * 10;
+          data.egoistic_part2      = parsed_response.Q17 * 10;
+          data.trustworthy_part2   = parsed_response.Q18 * 10;
+          data.honest_part2        = parsed_response.Q19 * 10;
+          data.faithful_part2      = parsed_response.Q20 * 10;
+          data.normal_part2        = parsed_response.Q21 * 10;
+          data.welladjusted_part2  = parsed_response.Q22 * 10;
+          data.satisfied_part2     = parsed_response.Q23 * 10;
+          data.happy_part2         = parsed_response.Q24 * 10;
+          data.confident_part2     = parsed_response.Q25 * 10;
+          data.selfregard_part2    = parsed_response.Q26 * 10;
+          data.mature_part2        = parsed_response.Q27 * 10;
+          data.healthy_part2       = parsed_response.Q28 * 10;
+          data.strong_part2        = parsed_response.Q29 * 10;
+          data.selfassertive_part2 = parsed_response.Q30 * 10;
+          data.dominant_part2      = parsed_response.Q31 * 10;
+          data.leader_part2        = parsed_response.Q32 * 10;
+          data.vain_part2          = parsed_response.Q33 * 10;
+          data.elitist_part2       = parsed_response.Q34 * 10;
+          data.snobbish_part2      = parsed_response.Q35 * 10;
+          data.shallow_part2       = parsed_response.Q36 * 10;
+          data.humble_part2        = parsed_response.Q37 * 10;
+          data.materialistic_part2 = parsed_response.Q38 * 10;
+          data.pompous_part2       = parsed_response.Q39 * 10;
+          data.prudish_part2       = parsed_response.Q40 * 10;
+          data.boastfull_part2     = parsed_response.Q41 * 10;
+          data.facejudged_part2    = ciImg.imgHtml;
+          data.firstname_part2     = ciImg.first_name;
         },
     };
     judgments_dimensions_part2.push(likert_trial);
@@ -846,11 +846,11 @@ stim_list.map(function(ciImg){
         //   $("li:last-of-type").css("width", "110px");
         },
         on_finish: function(data) {
-          data.task = "attractiveness_part1";
+          data.task = "attractiveness";
           var parsed_response  = JSON.parse(data.responses);
-          data.attractiveness    = parsed_response.Q0 * 10;
-          data.facejudged    = ciImg.imgHtml;
-          data.firstname     = ciImg.first_name;
+          data.attractiveness_part1    = parsed_response.Q0 * 10;
+          data.facejudged_part1    = ciImg.imgHtml;
+          data.firstname_part1     = ciImg.first_name;
           //data.faceattract              = ciImg.imgHtml;
         },
     };
@@ -881,11 +881,12 @@ stim_list.map(function(ciImg){
         //   $("li:last-of-type").css("width", "110px");
         },
         on_finish: function(data) {
-          data.task = "attractiveness_part2";
+          data.task = "attractiveness";
           var parsed_response  = JSON.parse(data.responses);
-          data.attractiveness    = parsed_response.Q0 * 10;
-          data.facejudged    = ciImg.imgHtml;
-          data.firstname     = ciImg.first_name;
+          data.attractiveness_part2    = parsed_response.Q0 * 10;
+          data.facejudged_part2    = ciImg.imgHtml;
+          data.firstname_part2     = ciImg.first_name;
+          //data.faceattract              = ciImg.imgHtml;
         },
     };
     judgments_attractiveness_part2.push(likert_trial);
@@ -1282,29 +1283,19 @@ switch(Cond_reval) {
         totalTime: jsPsych.totalTime()
       });
 
-      var datarating_part1 = data.filter({ task: 'rating_part1' }).csv();
-      var datarating_part2 = data.filter({ task: 'rating_part2' }).csv();
-      var dataattractiveness_part1 = data.filter({ task: 'attractiveness_part1' }).csv();
-      var dataattractiveness_part2 = data.filter({ task: 'attractiveness_part2' }).csv();
+      var datarating = data.filter({ task: 'rating' }).csv();
+      var dataattractiveness = data.filter({ task: 'attractiveness' }).csv();
       var datafirstnamememory = data.filter({ task: 'firstNameMemory' }).csv();
       var datarevalmemory = data.filter({ task: 'reval_memory' }).csv();
 
       /* Send data to Firebase */
       database
         .ref("feat_reval_3/" + jspsych_id + "/")
-        .update({ datarating_part1 })
+        .update({ datarating })
         .then(function () {
       database
         .ref("feat_reval_3/" + jspsych_id + "/")
-        .update({ datarating_part2 })
-        .then(function () {
-      database
-        .ref("feat_reval_3/" + jspsych_id + "/")
-        .update({ dataattractiveness_part1 })
-        .then(function () {
-      database
-        .ref("feat_reval_3/" + jspsych_id + "/")
-        .update({ dataattractiveness_part2 })
+        .update({ dataattractiveness })
         .then(function () {
       database
         .ref("feat_reval_3/" + jspsych_id + "/")
@@ -1320,9 +1311,7 @@ switch(Cond_reval) {
                 });
               });
             });
-          });
         });
-      });
     }
   });
 </script>
